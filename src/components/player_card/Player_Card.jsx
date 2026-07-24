@@ -14,7 +14,7 @@ function PlayerCard({ player }) {
   const currentCareerEntry = careerEntries.find((entry) => !entry.endYear) || careerEntries[careerEntries.length - 1];
   const club = currentCareerEntry?.club || profile.club || "Klubi nuk është vendosur";
   const league = currentCareerEntry?.league || profile.league || "Kampionati nuk është vendosur";
-  const fullName = `${player.name || ""} ${player.surname || ""}`.trim() || "Lojtar";
+  const fullName = `${profile.name ?? ""} ${profile.surname ?? ""}`.trim() || "Lojtar";
   const age = profile.age ? `${profile.age} vjeç` : "Mosha —";
   const birthdate = profile.birthdate || profile.dateOfBirth || "—";
 
