@@ -13,34 +13,36 @@ function Hero() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const snapshot = await get(ref(db, "users"));
+        
+        const [usersSnapshot, playersSnapshot] = await Promise.all([
+          get(ref(db, "users")),
+          get(ref(db, "players")),
+        ]);
 
-        if (!snapshot.exists()) {
-          setLoadingStats(false);
-          return;
+      const users = usersSnapshot.exists() ? usersSnapshot.val() : {};
+      const players = playersSnapshot.exists() ? playersSnapshot.val() : {};
+
+      let playerCount = Object.keys(players).length;
+      let scoutCount = 0;
+      const clubSet = new Set();
+
+      Object.values(users).forEach((user) => {
+        if (user.role === "scout") {
+          scoutCount++;
         }
+      });
 
-        const users = snapshot.val();
-
-        let playerCount = 0;
-        let scoutCount = 0;
-        const clubSet = new Set();
-
-        Object.values(users).forEach((user) => {
-          if (user.role === "player") playerCount += 1;
-          if (user.role === "scout") scoutCount += 1;
-
-          // Collect club names from career history (preferred) or the
-          // legacy profile.club field, so the count reflects real clubs
-          // players have actually entered.
-          if (user.career) {
-            Object.values(user.career).forEach((entry) => {
-              if (entry.club) clubSet.add(entry.club.trim().toLowerCase());
-            });
-          } else if (user.profile?.club) {
-            clubSet.add(user.profile.club.trim().toLowerCase());
-          }
-        });
+      Object.values(players).forEach((player) => {
+        if (player.career) {
+          Object.values(player.career).forEach((entry) => {
+            if (entry.club) {
+              clubSet.add(entry.club.trim().toLowerCase());
+            }
+          });
+        } else if (player.profile?.club) {
+          clubSet.add(player.profile.club.trim().toLowerCase());
+        }
+      });
 
         setStats({
           players: playerCount,

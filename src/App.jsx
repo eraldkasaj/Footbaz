@@ -45,8 +45,8 @@ function App() {
     <Route path="/visits" element={<Visits />} />
     <Route path="/settings" element={<Settings />} />
     <Route path="/player-settings" element={<Player_Settings />} />
-    <Route path="/forgot-password" element={<Forgot_Password/>}
-/>
+    <Route path="/forgot-password" element={<Forgot_Password/>} />
+
    </Routes>
       
     

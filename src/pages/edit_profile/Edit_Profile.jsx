@@ -79,7 +79,7 @@ if(user){
 
 
 const snapshot = await get(
-ref(db,"users/" + user.uid)
+ref(db,"players/" + user.uid)
 );
 
 
@@ -282,7 +282,7 @@ console.log("VIDEO:",data);
 if(data.secure_url){
 
 
-const videosRef = ref(db,"users/" + user.uid + "/videos");
+const videosRef = ref(db,"players/" + user.uid + "/videos");
 
 const newVideoRef = push(videosRef);
 
@@ -343,7 +343,7 @@ return;
 try{
 
 
-await remove(ref(db,"users/" + user.uid + "/videos/" + videoId));
+await remove(ref(db,"players/" + user.uid + "/videos/" + videoId));
 
 
 setVideos((previous)=>previous.filter((video)=>video.id !== videoId));
@@ -388,7 +388,7 @@ const computedAge = calculateAgeFromBirthdate(birthdate);
 
 await update(
 
-ref(db,"users/" + user.uid + "/profile"),
+  ref(db,"players/" + user.uid + "/profile"),
 
 {
 

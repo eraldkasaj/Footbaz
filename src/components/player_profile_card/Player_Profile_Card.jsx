@@ -154,7 +154,7 @@ useEffect(()=>{
 const getPlayer=async()=>{
 
 
-const snapshot=await get(ref(db,`users/${id}`));
+const snapshot = await get(ref(db, `players/${id}`));
 
 
 if(snapshot.exists()){
@@ -188,10 +188,10 @@ const birthdate=profile.birthdate || profile.dateOfBirth;
 
 const age=getPlayerAge(profile);
 
-const stats=player.stats || {};
+const stats = player.statistics || {};
 
 
-const fullName=`${player.name} ${player.surname}`;
+const fullName = `${profile.name || ""} ${profile.surname || ""}`;
 
 
 const careerEntries=Object.entries(player.career || {})

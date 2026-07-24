@@ -24,11 +24,9 @@ useEffect(() => {
 
 const getFeaturedPlayers = async () => {
 
+const playersRef = ref(db, "players");
 
-const usersRef = ref(db, "users");
-
-
-const snapshot = await get(usersRef);
+const snapshot = await get(playersRef);
 
 
 if (snapshot.exists()) {
@@ -36,12 +34,10 @@ if (snapshot.exists()) {
 
 const data = snapshot.val();
 
-
-const playersArray = Object.keys(data)
-
-.map((uid) => ({ uid, ...data[uid] }))
-
-.filter((user) => user.role === "player");
+const playersArray = Object.keys(data).map((uid) => ({
+  uid,
+  ...data[uid],
+}));
 
 
 // Prefer players with a complete-looking profile (photo + at least one
