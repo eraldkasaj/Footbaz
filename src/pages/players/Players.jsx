@@ -35,10 +35,9 @@ useEffect(()=>{
 const getPlayers = async()=>{
 
 
-const usersRef = ref(db,"users");
+const playersRef = ref(db, "players");
 
-
-const snapshot = await get(usersRef);
+const snapshot = await get(playersRef);
 
 
 if(snapshot.exists()){
@@ -47,17 +46,12 @@ if(snapshot.exists()){
 const data = snapshot.val();
 
 
-const playersArray = Object.keys(data).map((uid)=>({
-
-uid,
-...data[uid]
-
-}))
-.filter((user)=>user.role==="player");
-
+const playersArray = Object.keys(data).map((uid) => ({
+  uid,
+  ...data[uid],
+}));
 
 setPlayers(playersArray);
-
 
 }
 
@@ -93,7 +87,11 @@ let filteredPlayers = [...players];
 
 filteredPlayers = filteredPlayers.filter((player)=>
 
-(player.name + " " + player.surname)
+(
+  (player.profile?.name || "") +
+  " " +
+  (player.profile?.surname || "")
+)
 .toLowerCase()
 .includes(search.toLowerCase())
 

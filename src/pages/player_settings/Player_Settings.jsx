@@ -36,13 +36,24 @@ function Player_Settings() {
       }
 
       try {
-        const snapshot = await get(ref(db, `users/${user.uid}`));
-        const data = snapshot.val() || {};
+          const [userSnapshot, playerSnapshot] = await Promise.all([
+          get(ref(db, `users/${user.uid}`)),
+          get(ref(db, `players/${user.uid}`)),
+        ]);
 
-        setName(data.name || "");
-        setSurname(data.surname || "");
-        setEmail(user.email || data.email || "");
-        setAccountData(data);
+        const userData = userSnapshot.val() || {};
+        const playerData = playerSnapshot.val() || {};
+        const profile = playerData.profile || {};
+
+        setName(profile.name || "");
+        setSurname(profile.surname || "");
+        setEmail(user.email || userData.email || "");
+
+        setAccountData({
+          user: userData,
+          player: playerData,
+        });
+      
       } catch {
         setError("Nuk mundëm të ngarkojmë të dhënat e llogarisë.");
       } finally {
@@ -85,12 +96,28 @@ function Player_Settings() {
 
       await updateProfile(user, { displayName: `${name.trim()} ${surname.trim()}` });
       await update(ref(db, `users/${user.uid}`), {
-        name: name.trim(),
-        surname: surname.trim(),
-        email: nextEmail,
-      });
+       email: nextEmail,});
 
-      setAccountData((previous) => ({ ...previous, name: name.trim(), surname: surname.trim(), email: nextEmail }));
+      await update(ref(db, `players/${user.uid}/profile`), {
+      name: name.trim(),
+      surname: surname.trim(),
+    }); 
+
+     setAccountData((previous) => ({
+  ...previous,
+  user: {
+    ...previous.user,
+    email: nextEmail,
+  },
+  player: {
+    ...previous.player,
+    profile: {
+      ...previous.player?.profile,
+      name: name.trim(),
+      surname: surname.trim(),
+    },
+  },
+}));
       setCurrentPassword("");
       setMessage("Të dhënat e llogarisë u përditësuan.");
     } catch (saveError) {
@@ -133,13 +160,21 @@ function Player_Settings() {
     try {
       await reauthenticate(user);
       const userRef = ref(db, `users/${user.uid}`);
+      const playerRef = ref(db, `players/${user.uid}`);
 
       await remove(userRef);
+      await remove(playerRef);
 
       try {
         await deleteUser(user);
       } catch (deleteError) {
-        if (accountData) await set(userRef, accountData);
+       if (accountData?.user) {
+  await set(userRef, accountData.user);
+}
+
+if (accountData?.player) {
+  await set(playerRef, accountData.player);
+}
         throw deleteError;
       }
 

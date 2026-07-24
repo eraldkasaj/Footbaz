@@ -68,17 +68,32 @@ function Register() {
 
       const user = userCredential.user;
 
+    await set(ref(db, "users/" + user.uid), {
+  email,
+  role,
+  createdAt: new Date().toISOString(),
+});
 
-
-      await set(ref(db, "users/" + user.uid), {
-
-        name: name,
-        surname: surname,
-        email: email,
-        role: role,
-        createdAt: new Date().toISOString()
-
-      });
+if (role === "player") {
+  await set(ref(db, "players/" + user.uid), {
+    profile: {
+      name,
+      surname,
+      age: "",
+      birthdate: "",
+      nationality: "",
+      position: "",
+      height: "",
+      weight: "",
+      dominantFoot: "",
+      bio: "",
+      photoURL: "",
+    },
+    career: {},
+    statistics: {},
+    videos: {},
+  });
+}
 
 
       setSuccess("Llogaria u krijua me sukses. Po ridrejtoheni te Login...");

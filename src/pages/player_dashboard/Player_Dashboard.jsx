@@ -159,7 +159,7 @@ function Player_Dashboard() {
         return;
       }
 
-      const snapshot = await get(ref(db, `users/${user.uid}`));
+     const snapshot = await get(ref(db, `players/${user.uid}`));
 
       if (snapshot.exists()) {
         setUserData(snapshot.val());
@@ -206,7 +206,7 @@ function Player_Dashboard() {
     setCareerError("");
 
     try {
-      const careerRef = ref(db, `users/${user.uid}/career`);
+      const careerRef = ref(db, `players/${user.uid}/career`);
       const newEntryRef = push(careerRef);
 
       const entry = {
@@ -240,7 +240,7 @@ function Player_Dashboard() {
     if (!window.confirm("Ta heq këtë klub nga karriera jote?")) return;
 
     try {
-      await remove(ref(db, `users/${user.uid}/career/${entryId}`));
+      await remove(ref(db, `players/${user.uid}/career/${entryId}`));
 
       setUserData((previous) => {
         const nextCareer = { ...(previous?.career || {}) };
@@ -255,8 +255,8 @@ function Player_Dashboard() {
   const profile = userData?.profile ?? {};
   const birthdate = profile.birthdate || profile.dateOfBirth;
   const age = getPlayerAge(profile);
-  const stats = userData?.stats ?? {};
-  const fullName = [userData?.name, userData?.surname].filter(Boolean).join(" ") || "Profili im";
+  const stats = userData?.statistics ?? {};
+  const fullName =[profile.name, profile.surname].filter(Boolean).join(" ") || "Profili im";
   const pitchPosition = getPitchPosition(profile.position);
 
   const careerEntries = Object.entries(userData?.career || {})

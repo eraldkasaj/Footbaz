@@ -42,7 +42,7 @@ const user = auth.currentUser;
 if(user){
 
 
-const statsRef = ref(db,"users/" + user.uid + "/stats");
+const statsRef = ref(db,"players/" + user.uid + "/statistics");
 
 
 const snapshot = await get(statsRef);
@@ -110,7 +110,7 @@ const user = auth.currentUser;
 
 
 
-await update(ref(db,"users/" + user.uid + "/stats"),{
+await update(ref(db,"players/" + user.uid + "/statistics"),{
 
 
 season,

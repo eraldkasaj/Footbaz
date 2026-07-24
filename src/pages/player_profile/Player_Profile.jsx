@@ -21,27 +21,21 @@ const [player,setPlayer] = useState(null);
 
 useEffect(()=>{
 
+const getPlayer = async () => {
+  try {
+    const playerRef = ref(db, `players/${id}`);
 
-const getPlayer = async()=>{
+    const snapshot = await get(playerRef);
 
-
-const playerRef = ref(db,"users/" + id);
-
-
-const snapshot = await get(playerRef);
-
-
-
-if(snapshot.exists()){
-
-
-setPlayer(snapshot.val());
-
-
-}
-
-
-}
+    if (snapshot.exists()) {
+      setPlayer(snapshot.val());
+    } else {
+      setPlayer(null);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 
 
