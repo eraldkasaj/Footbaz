@@ -14,23 +14,19 @@ function Hero() {
     const fetchStats = async () => {
       try {
         
-        const [usersSnapshot, playersSnapshot] = await Promise.all([
-          get(ref(db, "users")),
-          get(ref(db, "players")),
-        ]);
+      const playersSnapshot = await get(ref(db, "players"));
 
-      const users = usersSnapshot.exists() ? usersSnapshot.val() : {};
-      const players = playersSnapshot.exists() ? playersSnapshot.val() : {};
+    const players = playersSnapshot.exists()
+      ? playersSnapshot.val()
+      : {};
+     
 
       let playerCount = Object.keys(players).length;
-      let scoutCount = 0;
+     
       const clubSet = new Set();
+      const scoutCount = 0;
 
-      Object.values(users).forEach((user) => {
-        if (user.role === "scout") {
-          scoutCount++;
-        }
-      });
+     
 
       Object.values(players).forEach((player) => {
         if (player.career) {
@@ -50,8 +46,8 @@ function Hero() {
           clubs: clubSet.size,
         });
       } catch (error) {
-        // Silently keep stats at 0 if the read fails; the section still renders.
-      } finally {
+  console.error(error);
+} finally {
         setLoadingStats(false);
       }
     };
