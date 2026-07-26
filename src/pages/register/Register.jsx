@@ -92,6 +92,7 @@ if (role === "player") {
     career: {},
     statistics: {},
     videos: {},
+    createdAt: new Date().toISOString(),
   });
 }
 
