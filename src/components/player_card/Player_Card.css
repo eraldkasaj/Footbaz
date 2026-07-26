@@ -36,25 +36,12 @@
 
 .player-card:hover .player-image { transform: scale(1.04); }
 
-.player-image-placeholder {
-  display: grid;
-  width: 100%;
-  height: 100%;
-  place-items: center;
+/* Foto default (silhouette) - s'duhet cover se e shtrembëron, përdor contain */
+.player-image--default {
+  object-fit: cover;
+  object-position: center 15%;
+  padding: 0;
   background: radial-gradient(circle at 50% 30%, #29465d, #0b1728 70%);
-  color: var(--brand-teal);
-}
-
-.player-image-placeholder span {
-  display: grid;
-  width: 74px;
-  height: 74px;
-  place-items: center;
-  border: 1px solid rgba(16, 183, 127, 0.38);
-  border-radius: 50%;
-  background: rgba(16, 183, 127, 0.1);
-  font-size: 1.4rem;
-  font-weight: 800;
 }
 
 .player-badge {

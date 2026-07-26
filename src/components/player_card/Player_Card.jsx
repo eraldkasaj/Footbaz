@@ -7,6 +7,7 @@ import {
   LuShield,
   LuTrophy,
 } from "react-icons/lu";
+import defaultAvatar from "../../assets/images/avatar-player.png";
 
 function PlayerCard({ player }) {
   const profile = player.profile || {};
@@ -17,17 +18,16 @@ function PlayerCard({ player }) {
   const fullName = `${profile.name ?? ""} ${profile.surname ?? ""}`.trim() || "Lojtar";
   const age = profile.age ? `${profile.age} vjeç` : "Mosha —";
   const birthdate = profile.birthdate || profile.dateOfBirth || "—";
+  const hasPhoto = Boolean(profile.photoURL);
 
   return (
     <article className="player-card">
       <div className="player-image-wrap">
-        {profile.photoURL ? (
-          <img src={profile.photoURL} className="player-image" alt={fullName} />
-        ) : (
-          <div className="player-image-placeholder" aria-label="Foto e lojtarit mungon">
-            <span>{fullName.split(" ").map((name) => name[0]).join("").slice(0, 2)}</span>
-          </div>
-        )}
+        <img
+          src={hasPhoto ? profile.photoURL : defaultAvatar}
+          className={`player-image${hasPhoto ? "" : " player-image--default"}`}
+          alt={fullName}
+        />
 
         <span className="player-badge player-badge--position">
           {profile.position ? profile.position.toUpperCase() : "—"}
