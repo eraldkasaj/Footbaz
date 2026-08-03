@@ -9,6 +9,7 @@ import { ref,get,update,push,set,remove } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 
 import { calculateAgeFromBirthdate } from "../../utils/age";
+import { LEAGUE_OPTIONS } from "../../data/leagues";
 
 
 // Countries most relevant for an Albanian-speaking scouting platform first,
@@ -50,6 +51,8 @@ const navigate = useNavigate();
 
 
 const [position,setPosition] = useState("");
+const [club,setClub] = useState("");
+const [league,setLeague] = useState("");
 const [bio,setBio] = useState("");
 const [height,setHeight] = useState("");
 const [weight,setWeight] = useState("");
@@ -92,6 +95,10 @@ const profileData = data.profile || {};
 
 
 setPosition(profileData.position || "");
+
+setClub(profileData.club || "");
+
+setLeague(profileData.league || "");
 
 setBio(profileData.bio || "");
 
@@ -394,6 +401,10 @@ await update(
 
 
 position,
+
+club,
+
+league,
 
 bio,
 
@@ -698,6 +709,60 @@ onChange={(e)=>setPosition(e.target.value)}
 <option value="CF">Qendër Sulmues (CF)</option>
 <option value="ST">Sulmues (ST)</option>
 </optgroup>
+
+</select>
+
+</div>
+
+
+
+
+<div className="form-group">
+
+<label>Klubi aktual</label>
+
+
+<input
+
+type="text"
+
+placeholder="p.sh. Flamurtari FC"
+
+value={club}
+
+onChange={(e)=>setClub(e.target.value)}
+
+/>
+
+</div>
+
+
+
+
+<div className="form-group">
+
+<label>Kampionati aktual</label>
+
+
+<select
+
+value={league}
+
+onChange={(e)=>setLeague(e.target.value)}
+
+>
+
+<option value="">Zgjidh kampionatin</option>
+
+{LEAGUE_OPTIONS.map((leagueOption)=>(
+
+<option key={leagueOption} value={leagueOption}>
+
+{leagueOption}
+
+</option>
+
+))}
 
 </select>
 

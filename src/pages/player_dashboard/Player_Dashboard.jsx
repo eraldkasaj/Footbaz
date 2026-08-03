@@ -19,6 +19,9 @@ import {
   LuTrash2,
   LuX,
 } from "react-icons/lu";
+// Kept in a shared file so Edit Profile (current league) and this file's
+// career modal (historical league per club) use the exact same list.
+import { LEAGUE_OPTIONS } from "../../data/leagues";
 
 const statItems = [
   ["matches", "Ndeshje"],
@@ -29,38 +32,6 @@ const statItems = [
 ];
 
 const detailedStatItems = [...statItems, ["minutes", "Minuta të luajtura"]];
-
-// Official Albanian league/competition tiers (FSHF), used as the fixed set of
-// choices for the "Kampionati" field so players pick from a real list
-// instead of typing free text.
-const LEAGUE_OPTIONS = [
-  "Abissnet Superiore",
-  "Abissnet Superiore U-21",
-  "U-19 Abissnet Superiore",
-  "U-17 Abissnet Superiore",
-  "U-16 Abissnet Superiore",
-  "U-15 Abissnet Superiore",
-  "U-14 Abissnet Superiore",
-  "U-13 Abissnet Superiore",
-  "Superiore Vajza",
-  "Kategoria e Parë",
-  "Kategoria e Parë U-19",
-  "Kategoria e Dytë U-19",
-  "Kategoria e Parë U-17",
-  "Kategoria e Dytë U-17",
-  "Kategoria e Parë U-15",
-  "Kategoria e Dytë U-15",
-  "Kategoria e Parë U-14",
-  "Kategoria e Dytë U-14",
-  "Kategoria e Parë U-13",
-  "Kategoria e Dytë U-13",
-  "Kategoria e Dytë A",
-  "Kategoria e Dytë B",
-  "Kategoria e Tretë",
-  "Fustal League",
-  "5x5",
-  "Kupa e Shqipërisë",
-];
 
 // Every individual position the pitch can highlight. Keys are the canonical
 // codes used both by the CSS classes (lowercased) and by getPositionName.
@@ -266,17 +237,19 @@ function Player_Dashboard() {
 
   const careerEntries = Object.entries(userData?.career || {})
     .map(([id, entry]) => ({ id, ...entry }))
-    .sort((a, b) => (Number(b.startYear) || 0) - (Number(a.startYear) || 0));
+    // parseInt (not Number) so a malformed value like "2025-2026" still sorts
+    // by its leading year (2025) instead of falling back to 0 and sinking to
+    // the bottom. Newest club first, oldest last.
+    .sort((a, b) => (parseInt(b.startYear, 10) || 0) - (parseInt(a.startYear, 10) || 0));
 
-  // The "current" club/league now come from the career entry the player
-  // marked as ongoing (no endYear) — added once, from the Karriera tab —
-  // instead of a separate Klubi/Liga field in Edit Profile. This keeps club
-  // info editable from a single place. Older accounts that only have the
-  // legacy profile.club/profile.league (no career entries yet) still work
-  // via the fallback below.
+  // Klubi aktual dhe kampionati vendosen te Edito Profilin (profile.club /
+  // profile.league). Për llogaritë e vjetra që e kishin vendosur klubin
+  // vetëm duke shtuar një zë karriere pa datë mbarimi (para se të kishte
+  // fusha të dedikuara), bie fallback te ai zë — kështu askush s'e humb
+  // klubin që kishte vendosur më parë.
   const currentCareerEntry = careerEntries.find((entry) => !entry.endYear);
-  const club = currentCareerEntry?.club || profile.club || "Klubi nuk është vendosur";
-  const league = currentCareerEntry?.league || profile.league || "Superliga Shqiptare U-19";
+  const club = profile.club || currentCareerEntry?.club || "Klubi nuk është vendosur";
+  const league = profile.league || currentCareerEntry?.league || "Superliga Shqiptare U-19";
 
   const videoEntries = userData?.videos
     ? Object.entries(userData.videos)
@@ -536,9 +509,10 @@ function Player_Dashboard() {
                     Nga (viti)
                     <input
                       value={careerForm.startYear}
-                      onChange={(event) => setCareerForm((previous) => ({ ...previous, startYear: event.target.value }))}
+                      onChange={(event) => setCareerForm((previous) => ({ ...previous, startYear: event.target.value.replace(/\D/g, "").slice(0, 4) }))}
                       placeholder="2022"
                       inputMode="numeric"
+                      maxLength={4}
                     />
                   </label>
 
@@ -546,9 +520,10 @@ function Player_Dashboard() {
                     Deri (viti)
                     <input
                       value={careerForm.endYear}
-                      onChange={(event) => setCareerForm((previous) => ({ ...previous, endYear: event.target.value }))}
+                      onChange={(event) => setCareerForm((previous) => ({ ...previous, endYear: event.target.value.replace(/\D/g, "").slice(0, 4) }))}
                       placeholder="Lëre bosh nëse je aktual"
                       inputMode="numeric"
+                      maxLength={4}
                     />
                   </label>
                 </div>

@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import logo_img from "../../assets/images/logo.png";
 import { useState } from "react";
 import { auth, db } from "../../firebase/firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, sendEmailVerification, signOut } from "firebase/auth";
 import { ref, get } from "firebase/database";
 import { LuArrowLeft } from "react-icons/lu";
 
@@ -33,6 +33,27 @@ function Login() {
         );
 
       const user = userCredential.user;
+
+      // Firebase vetëm kontrollon formatin e email-it te regjistrimi, jo nëse
+      // ai ekziston vërtet — prandaj hyrja lejohet vetëm pasi email-i të jetë
+      // konfirmuar duke klikuar linkun e dërguar. Signin-i më sipër tashmë e
+      // ka krijuar sesionin, kështu që e mbyllim (signOut) për të mos lënë
+      // llogari të hapur pa verifikim.
+      if (!user.emailVerified) {
+
+        try {
+          await sendEmailVerification(user);
+        } catch {
+          // Nëse dërgimi dështon (p.sh. shumë kërkesa), vazhdojmë gjithsesi
+          // ta bllokojmë hyrjen — përdoruesi mund të riprovojë pas pak.
+        }
+
+        await signOut(auth);
+
+        setError("Email-i yt nuk është verifikuar ende. Të kemi dërguar një link të ri verifikimi — kontrollo email-in (edhe dosjen Spam) para se të hysh.");
+
+        return;
+      }
 
 
       const userRef = ref(db, "users/" + user.uid);

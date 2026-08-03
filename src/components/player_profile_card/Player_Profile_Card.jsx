@@ -198,19 +198,20 @@ const careerEntries=Object.entries(player.career || {})
 
 .map(([entryId,entry])=>({id:entryId,...entry}))
 
-.sort((a,b)=>(Number(b.startYear)||0)-(Number(a.startYear)||0));
+// parseInt (jo Number) që një vlerë e keqformuar si "2025-2026" të rendisë
+// sipas vitit fillestar (2025) në vend që të bjerë në fund si 0.
+.sort((a,b)=>(parseInt(b.startYear,10)||0)-(parseInt(a.startYear,10)||0));
 
 
-// Same rule as Player_Dashboard.jsx: the current club/league come from the
-// career entry the player marked as ongoing (no endYear), falling back to
-// the legacy profile.club/profile.league for older accounts.
+// Klubi aktual vjen nga profili (vendoset te Edito Profilin). Për llogaritë
+// e vjetra që e kishin vendosur klubin vetëm si zë karriere pa datë mbarimi
+// (para se të kishte fusha të dedikuara), bie fallback te ai zë.
 const currentCareerEntry=careerEntries.find((entry)=>!entry.endYear);
 
+const club=profile.club || currentCareerEntry?.club || "Klubi nuk është vendosur";
 
-const club=currentCareerEntry?.club || profile.club || "Klubi nuk është vendosur";
 
-
-const league=currentCareerEntry?.league || profile.league || "Superliga Shqiptare U-19";
+const league=profile.league || currentCareerEntry?.league || "Superliga Shqiptare U-19";
 
 
 const pitchPosition=getPitchPosition(profile.position);
