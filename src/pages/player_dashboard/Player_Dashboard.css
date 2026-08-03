@@ -559,6 +559,8 @@
 
 .talento-career-form input,
 .talento-career-form select {
+  width: 100%;
+
   background: #05101e;
   border: 1px solid #24354c;
   border-radius: 10px;
@@ -586,6 +588,13 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
+}
+
+.talento-career-form-row > label {
+  /* Grid items default to min-width: auto, so a long placeholder like the
+     one on "Deri (viti)" can force the input past its 1fr track and out of
+     the modal. min-width: 0 lets it shrink to the actual track width. */
+  min-width: 0;
 }
 
 .talento-career-form-actions {

@@ -6,7 +6,7 @@ import { useState } from "react";
 
 import { auth, db } from "../../firebase/firebase";
 
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification, deleteUser } from "firebase/auth";
 
 import { ref, set } from "firebase/database";
 
@@ -28,6 +28,7 @@ function Register() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [role, setRole] = useState("player");
+  const [emailFocused, setEmailFocused] = useState(false);
 
 
 
@@ -68,36 +69,66 @@ function Register() {
 
       const user = userCredential.user;
 
-    await set(ref(db, "users/" + user.uid), {
-  email,
-  role,
-  createdAt: new Date().toISOString(),
-});
+    // Nga këtu e poshtë, llogaria e Auth ekziston tashmë. Nëse ndonjë shkrim
+    // te Database dështon (rrjet, rregulla sigurie, etj.), e fshijmë
+    // llogarinë e Auth që sapo u krijua — përndryshe email-i mbetet i "zënë"
+    // (auth/email-already-in-use) përgjithmonë, pa asnjë profil pas tij.
+    try {
 
-if (role === "player") {
-  await set(ref(db, "players/" + user.uid), {
-    profile: {
-      name,
-      surname,
-      age: "",
-      birthdate: "",
-      nationality: "",
-      position: "",
-      height: "",
-      weight: "",
-      dominantFoot: "",
-      bio: "",
-      photoURL: "",
-    },
-    career: {},
-    statistics: {},
-    videos: {},
-    createdAt: new Date().toISOString(),
-  });
-}
+      await set(ref(db, "users/" + user.uid), {
+        email,
+        role,
+        createdAt: new Date().toISOString(),
+      });
 
+      if (role === "player") {
+        await set(ref(db, "players/" + user.uid), {
+          profile: {
+            name,
+            surname,
+            age: "",
+            birthdate: "",
+            nationality: "",
+            position: "",
+            club: "",
+            league: "",
+            height: "",
+            weight: "",
+            dominantFoot: "",
+            bio: "",
+            photoURL: "",
+          },
+          career: {},
+          statistics: {},
+          videos: {},
+          createdAt: new Date().toISOString(),
+        });
+      }
 
-      setSuccess("Llogaria u krijua me sukses. Po ridrejtoheni te Login...");
+    } catch (dbError) {
+
+      try {
+        await deleteUser(user);
+      } catch {
+        // Nëse edhe fshirja dështon, të paktën provuam — përdoruesi mund të
+        // kontaktojë suportin nëse email-i mbetet i bllokuar.
+      }
+
+      throw dbError;
+    }
+
+    // Firebase vetëm kontrollon formatin e email-it, jo nëse ai ekziston
+    // vërtet. Dërgojmë një link verifikimi — llogaria nuk mund të hyjë
+    // (shih Login.jsx) derisa email-i i vërtetë të konfirmohet duke klikuar
+    // linkun.
+    try {
+      await sendEmailVerification(user);
+    } catch {
+      // Nëse dërgimi dështon (p.sh. shumë kërkesa), llogaria mbetet e
+      // krijuar — përdoruesi mund të marrë linkun sërish kur provon të hyjë.
+    }
+
+      setSuccess("Llogaria u krijua me sukses. Të kemi dërguar një email verifikimi — konfirmoje para se të hysh. Po ridrejtoheni te Login...");
 
       setTimeout(() => {
 
@@ -222,8 +253,16 @@ if (role === "player") {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            onFocus={() => setEmailFocused(true)}
+            onBlur={() => setEmailFocused(false)}
             autoComplete="email"
           />
+
+          {emailFocused && (
+            <p className="register-hint">
+              Përdor një email real që e kontrollon shpesh — do të duhet ta verifikosh (linku i konfirmimit) para se të mund të hysh në llogari.
+            </p>
+          )}
 
           <input
             type="password"

@@ -190,6 +190,16 @@
     font-weight:700;
 }
 
+.register-hint{
+    margin-top:-8px;
+
+    color:var(--text-secondary);
+    font-size:0.82rem;
+    line-height:1.4;
+
+    padding:0 4px;
+}
+
 .register-error{
 background:rgba(239,68,68,.12);
 border:1px solid rgba(239,68,68,.35);

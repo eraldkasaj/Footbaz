@@ -11,10 +11,13 @@ import defaultAvatar from "../../assets/images/avatar-player.png";
 
 function PlayerCard({ player }) {
   const profile = player.profile || {};
+  // Klubi aktual vjen nga profili (vendoset te Edito Profilin). Për llogaritë
+  // e vjetra që e kishin vendosur klubin vetëm si zë karriere pa datë
+  // mbarimi (para se të kishte fusha të dedikuara), bie fallback te ai zë.
   const careerEntries = Object.values(player.career || {});
   const currentCareerEntry = careerEntries.find((entry) => !entry.endYear) || careerEntries[careerEntries.length - 1];
-  const club = currentCareerEntry?.club || profile.club || "Klubi nuk është vendosur";
-  const league = currentCareerEntry?.league || profile.league || "Kampionati nuk është vendosur";
+  const club = profile.club || currentCareerEntry?.club || "Klubi nuk është vendosur";
+  const league = profile.league || currentCareerEntry?.league || "Kampionati nuk është vendosur";
   const fullName = `${profile.name ?? ""} ${profile.surname ?? ""}`.trim() || "Lojtar";
   const age = profile.age ? `${profile.age} vjeç` : "Mosha —";
   const birthdate = profile.birthdate || profile.dateOfBirth || "—";
