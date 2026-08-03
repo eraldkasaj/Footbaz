@@ -4,13 +4,13 @@ import { getDatabase } from "firebase/database";
 
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCxXZj-Aa_dpuofbQSgKcDgXK3k9Y6Pilk",
-  authDomain: "talento11.firebaseapp.com",
-  databaseURL: "https://talento11-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "talento11",
-  storageBucket: "talento11.firebasestorage.app",
-  messagingSenderId: "435471627098",
-  appId: "1:435471627098:web:9a5265aaa1869b6388f963"
+  apiKey: "AIzaSyAIOS-HQoAOjAZWcJ22dqu45-WRajAZ-q4",
+  authDomain: "footbaz.firebaseapp.com",
+  databaseURL: "https://footbaz-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "footbaz",
+  storageBucket: "footbaz.firebasestorage.app",
+  messagingSenderId: "719543232765",
+  appId: "1:719543232765:web:95e3663096cc5d09417694"
 };
 
 
