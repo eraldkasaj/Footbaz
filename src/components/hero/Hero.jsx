@@ -7,47 +7,27 @@ import { ref, get } from "firebase/database";
 import heroPhone from "../../assets/images/hero-phone.png";
 
 function Hero() {
-  const [stats, setStats] = useState({ players: 0, scouts: 0, clubs: 0 });
+  const [stats, setStats] = useState({ players: 0, clubs: 0 });
   const [loadingStats, setLoadingStats] = useState(true);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        
-      const playersSnapshot = await get(ref(db, "players"));
+        const playersSnapshot = await get(ref(db, "players"));
+        const players = playersSnapshot.exists() ? playersSnapshot.val() : {};
+        const playerCount = Object.keys(players).length;
 
-    const players = playersSnapshot.exists()
-      ? playersSnapshot.val()
-      : {};
-     
-
-      let playerCount = Object.keys(players).length;
-     
-      const clubSet = new Set();
-      const scoutCount = 0;
-
-     
-
-      Object.values(players).forEach((player) => {
-        if (player.career) {
-          Object.values(player.career).forEach((entry) => {
-            if (entry.club) {
-              clubSet.add(entry.club.trim().toLowerCase());
-            }
-          });
-        } else if (player.profile?.club) {
-          clubSet.add(player.profile.club.trim().toLowerCase());
-        }
-      });
+        const clubsSnapshot = await get(ref(db, "clubs"));
+        const clubs = clubsSnapshot.exists() ? clubsSnapshot.val() : {};
+        const clubCount = Object.keys(clubs).length;
 
         setStats({
           players: playerCount,
-          scouts: scoutCount,
-          clubs: clubSet.size,
+          clubs: clubCount,
         });
       } catch (error) {
-  console.error(error);
-} finally {
+        console.error(error);
+      } finally {
         setLoadingStats(false);
       }
     };
@@ -91,15 +71,10 @@ function Hero() {
             </div>
             <div className="hero-stat-divider" />
             <div className="hero-stat">
-              <h3 className={!loadingStats && stats.scouts === 0 ? "hero-stat-soon" : ""}>
-                {loadingStats ? "—" : stats.scouts === 0 ? "Së shpejti" : stats.scouts}
+              <h3 className={!loadingStats && stats.clubs === 0 ? "hero-stat-soon" : ""}>
+                {loadingStats ? "—" : stats.clubs === 0 ? "Së shpejti" : stats.clubs}
               </h3>
-              <p>Skautë aktivë</p>
-            </div>
-            <div className="hero-stat-divider" />
-            <div className="hero-stat">
-              <h3>{loadingStats ? "—" : stats.clubs}</h3>
-              <p>Klube partnere</p>
+              <p>Klube të regjistruara</p>
             </div>
           </div>
         </div>

@@ -40,7 +40,10 @@ function Register() {
     setError("");
     setSuccess("");
 
-    if (!name || !surname || !email || !password || !confirmPassword) {
+    const missingPlayerFields = role === "player" && (!name || !surname);
+    const missingClubFields = role === "club" && !name;
+
+    if (missingPlayerFields || missingClubFields || !email || !password || !confirmPassword) {
 
       setError("Plotësoni të gjitha fushat.");
 
@@ -101,6 +104,22 @@ function Register() {
           career: {},
           statistics: {},
           videos: {},
+          createdAt: new Date().toISOString(),
+        });
+      }
+
+      if (role === "club") {
+        await set(ref(db, "clubs/" + user.uid), {
+          profile: {
+            name,
+            city: "",
+            country: "",
+            foundedYear: "",
+            description: "",
+            contactEmail: email,
+            contactPhone: "",
+            photoURL: "",
+          },
           createdAt: new Date().toISOString(),
         });
       }
@@ -229,7 +248,7 @@ function Register() {
 
           <input
             type="text"
-            placeholder="Emri"
+            placeholder={role === "club" ? "Emri i klubit" : "Emri"}
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
@@ -237,12 +256,14 @@ function Register() {
 
 
 
-          <input
-            type="text"
-            placeholder="Mbiemri"
-            value={surname}
-            onChange={(e) => setSurname(e.target.value)}
-          />
+          {role === "player" && (
+            <input
+              type="text"
+              placeholder="Mbiemri"
+              value={surname}
+              onChange={(e) => setSurname(e.target.value)}
+            />
+          )}
 
 
 
@@ -320,13 +341,13 @@ function Register() {
               <input
                 type="radio"
                 name="role"
-                value="scout"
-                checked={role === "scout"}
+                value="club"
+                checked={role === "club"}
                 onChange={(e) => setRole(e.target.value)}
               />
 
 
-              Scout
+              Klub
 
 
             </label>

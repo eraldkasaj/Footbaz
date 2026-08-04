@@ -13,7 +13,7 @@ function Footer() {
           </Link>
 
           <p className="footer-description">
-            Shfaq talentin tënd. Lidhu me scoutë, akademi dhe klube futbolli.
+            Shfaq talentin tënd. Lidhu me klube dhe akademi futbolli.
           </p>
 
           <span className="footer-tagline">TALENTI YT, MUNDËSIA JOTE</span>
@@ -31,7 +31,7 @@ function Footer() {
             <h3>Llogaria</h3>
             <Link to="/login">Hyr</Link>
             <Link to="/register">Regjistrohu</Link>
-            <Link to="/player-scout">Scoutët</Link>
+            <Link to="/clubs">Klubet</Link>
           </div>
 
           <div className="footer-column">

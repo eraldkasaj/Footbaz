@@ -1,0 +1,149 @@
+.clubs-page{
+    min-height:100vh;
+    background:var(--bg-primary);
+    padding:96px 6% 64px;
+
+    position:relative;
+    overflow:hidden;
+}
+
+.clubs-page::before{
+    content:"";
+    position:absolute;
+    top:-100px;
+    left:50%;
+    transform:translateX(-50%);
+
+    width:900px;
+    height:460px;
+
+    background:radial-gradient(
+        circle,
+        rgba(23,178,106,.13) 0%,
+        rgba(23,178,106,0) 70%
+    );
+
+    pointer-events:none;
+}
+
+.clubs-header{
+    position:relative;
+    z-index:1;
+
+    text-align:center;
+    margin-bottom:32px;
+}
+
+.clubs-eyebrow{
+    display:inline-block;
+    color:var(--brand-teal);
+    font-size:0.8rem;
+    font-weight:700;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    margin-bottom:8px;
+}
+
+.clubs-header h1{
+    color:var(--text-primary);
+    font-size:2rem;
+    font-weight:800;
+    margin-bottom:10px;
+}
+
+.clubs-header p{
+    color:var(--text-secondary);
+    font-size:0.98rem;
+}
+
+.clubs-search-panel{
+    position:relative;
+    z-index:1;
+
+    max-width:1100px;
+    margin:0 auto 28px;
+
+    display:flex;
+    justify-content:center;
+}
+
+.clubs-search-input{
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+    background:#0d1830;
+    border:1px solid var(--border);
+    border-radius:10px;
+
+    padding:0 14px;
+
+    height:44px;
+
+    width:320px;
+
+    transition:border-color .25s ease, box-shadow .25s ease;
+}
+
+.clubs-search-input svg{
+    color:var(--text-secondary);
+    font-size:16px;
+    flex-shrink:0;
+}
+
+.clubs-search-input:focus-within{
+    border-color:var(--brand-teal);
+    box-shadow:0 0 0 3px rgba(23,178,106,.12);
+}
+
+.clubs-search-input input{
+    background:none;
+    border:none;
+    outline:none;
+
+    color:var(--text-primary);
+    font-size:0.9rem;
+
+    width:100%;
+    height:100%;
+}
+
+.clubs-search-input input::placeholder{
+    color:var(--text-secondary);
+}
+
+.clubs-empty{
+    position:relative;
+    z-index:1;
+
+    text-align:center;
+    color:var(--text-secondary);
+    font-size:0.98rem;
+    padding:56px 0;
+}
+
+.clubs-grid{
+    position:relative;
+    z-index:1;
+
+    max-width:1100px;
+    margin:0 auto;
+
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+    gap:20px;
+}
+
+@media (max-width:900px){
+    .clubs-page{
+        padding:80px 5% 48px;
+    }
+
+    .clubs-header h1{
+        font-size:1.7rem;
+    }
+
+    .clubs-search-input{
+        width:100%;
+    }
+}

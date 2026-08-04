@@ -72,9 +72,9 @@ function Login() {
 
           navigate("/player-dashboard");
 
-        } else if (userData.role === "scout") {
+        } else if (userData.role === "club") {
 
-          navigate("/scout-dashboard");
+          navigate("/club-dashboard");
 
         }
 

@@ -1,0 +1,14 @@
+.club-profile {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  padding: 96px 6% 64px;
+}
+
+.club-profile-loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  background: var(--bg-primary);
+}
