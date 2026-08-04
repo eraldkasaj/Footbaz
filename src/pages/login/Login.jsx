@@ -130,7 +130,7 @@ setError("Ndodhi një gabim. Provo përsëri.");
         <Link to="/">
           <img
             src={logo_img}
-            alt="Talento11"
+            alt="Footbaz"
             className="login-logo"
           />
         </Link>

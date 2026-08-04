@@ -8,8 +8,8 @@ function Footer() {
     <footer className="footer">
       <div className="footer-main">
         <div className="footer-top">
-          <Link to="/" aria-label="Talento11 - Faqja kryesore">
-            <img src={logo_img} alt="Talento11" className="footer-logo" />
+          <Link to="/" aria-label="Footbaz - Faqja kryesore">
+            <img src={logo_img} alt="Footbaz" className="footer-logo" />
           </Link>
 
           <p className="footer-description">

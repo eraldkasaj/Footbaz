@@ -17,7 +17,7 @@ function Scouts() {
           <h1>Scoutët</h1>
 
           <p>
-            Zbulo scoutët profesionistë të platformës Talento11.
+            Zbulo scoutët profesionistë të platformës Footbaz.
           </p>
 
         </div>

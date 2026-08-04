@@ -65,7 +65,7 @@ return(
 
 <img
 src={logo_img}
-alt="Talento11"
+alt="Footbaz"
 className="login-logo"
 />
 

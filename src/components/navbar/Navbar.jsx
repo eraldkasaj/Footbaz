@@ -24,7 +24,7 @@ function Navbar() {
 
         <Link to="/" onClick={closeMenu}>
 
-          <img src={logo_img} alt="Talento11 logo" />
+          <img src={logo_img} alt="Footbaz logo" />
 
         </Link>
 

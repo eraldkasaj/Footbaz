@@ -189,7 +189,7 @@ function Register() {
         <Link to="/">
           <img
             src={logo_img}
-            alt="Talento11"
+            alt="Footbaz"
             className="register-logo"
           />
         </Link>

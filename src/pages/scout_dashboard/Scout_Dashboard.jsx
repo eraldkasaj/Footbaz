@@ -291,7 +291,7 @@ return(
 
 <h2 className="scout-logo">
 
-Talento<span>11</span>
+Foot<span>baz</span>
 
 </h2>
 

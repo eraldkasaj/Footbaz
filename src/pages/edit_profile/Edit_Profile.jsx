@@ -187,7 +187,7 @@ const formData = new FormData();
 
 formData.append("file",file);
 
-formData.append("upload_preset","talento11_players");
+formData.append("upload_preset","footbaz_players");
 
 
 
@@ -257,7 +257,7 @@ const formData = new FormData();
 
 formData.append("file",file);
 
-formData.append("upload_preset","talento11_players");
+formData.append("upload_preset","footbaz_players");
 
 
 

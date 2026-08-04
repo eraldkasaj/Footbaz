@@ -106,7 +106,7 @@ function Hero() {
 
         <div className="hero-right">
           <div className="hero-phone-showcase">
-            <img className="hero-phone-art" src={heroPhone} alt="Talento11 - profil lojtari" />
+            <img className="hero-phone-art" src={heroPhone} alt="Footbaz - profil lojtari" />
           </div>
         </div>
       </section>

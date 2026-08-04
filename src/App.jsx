@@ -13,7 +13,6 @@ import Scout_Dashboard from "./pages/scout_dashboard/Scout_Dashboard";
 import My_Profile from "./pages/my_profile/My_Profile";
 import Edit_Profile from "./pages/edit_profile/Edit_Profile";
 import Statistics from "./pages/statistics/Statistics";
-import Highlights from "./pages/highlights/Highlights";
 import Messages from "./pages/messages/Messages";
 import Visits from "./pages/visits/Visits";
 import Settings from "./pages/settings/Settings";
@@ -40,7 +39,6 @@ function App() {
     <Route path="/my-profile" element={<My_Profile />} />
     <Route path="/edit-profile" element={<Edit_Profile />} />
     <Route path="/statistics" element={<Statistics />} />
-    <Route path="/highlights" element={<Highlights />} />
     <Route path="/messages" element={<Messages />} />
     <Route path="/visits" element={<Visits />} />
     <Route path="/settings" element={<Settings />} />
