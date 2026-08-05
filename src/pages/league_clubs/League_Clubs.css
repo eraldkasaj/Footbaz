@@ -1,0 +1,183 @@
+.league-clubs-page{
+    min-height:100vh;
+    background:var(--bg-primary);
+    padding:96px 6% 64px;
+}
+
+.league-clubs-header{
+    position:relative;
+
+    max-width:900px;
+    margin:0 auto 32px;
+
+    text-align:center;
+}
+
+.league-clubs-back{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+
+    color:var(--text-secondary);
+    font-size:0.85rem;
+    font-weight:600;
+    text-decoration:none;
+
+    margin-bottom:20px;
+    transition:color .2s ease;
+}
+
+.league-clubs-back:hover{
+    color:var(--brand-teal);
+}
+
+.league-clubs-eyebrow{
+    display:inline-block;
+    color:var(--brand-teal);
+    font-size:0.8rem;
+    font-weight:700;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    margin-bottom:8px;
+}
+
+.league-clubs-header h1{
+    color:var(--text-primary);
+    font-size:1.8rem;
+    font-weight:800;
+    margin-bottom:8px;
+}
+
+.league-clubs-header p{
+    color:var(--text-secondary);
+    font-size:0.95rem;
+}
+
+.league-clubs-empty{
+    text-align:center;
+    color:var(--text-secondary);
+    font-size:0.98rem;
+    padding:56px 0;
+}
+
+.league-clubs-table-wrap{
+    max-width:900px;
+    margin:0 auto;
+
+    background:var(--bg-secondary);
+    border:1px solid var(--border);
+    border-radius:12px;
+    overflow:hidden;
+}
+
+.league-clubs-table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.league-clubs-table thead th{
+    text-align:left;
+    color:var(--text-secondary);
+    font-size:0.75rem;
+    font-weight:700;
+    letter-spacing:0.03em;
+    text-transform:uppercase;
+
+    background:#0d1830;
+    padding:12px 16px;
+    border-bottom:1px solid var(--border);
+}
+
+.league-clubs-table tbody tr{
+    border-bottom:1px solid var(--border);
+    transition:background-color .2s ease;
+}
+
+.league-clubs-table tbody tr:last-child{
+    border-bottom:none;
+}
+
+.league-clubs-table tbody tr:hover{
+    background:rgba(23,178,106,.06);
+}
+
+.league-clubs-table td{
+    padding:12px 16px;
+    color:var(--text-primary);
+    font-size:0.9rem;
+    vertical-align:middle;
+}
+
+.league-clubs-rank{
+    width:44px;
+    color:var(--text-secondary);
+    font-weight:600;
+    text-align:center;
+}
+
+.league-clubs-club{
+    min-width:200px;
+}
+
+.league-clubs-club-link{
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    color:var(--text-primary);
+    font-weight:700;
+    text-decoration:none;
+}
+
+.league-clubs-logo{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    width:32px;
+    height:32px;
+    border-radius:8px;
+
+    background:var(--bg-primary);
+    border:1px solid var(--border);
+    color:var(--text-secondary);
+    overflow:hidden;
+    flex-shrink:0;
+}
+
+.league-clubs-logo img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.league-clubs-city{
+    color:var(--text-secondary);
+}
+
+.league-clubs-action{
+    width:36px;
+    text-align:right;
+}
+
+.league-clubs-action a{
+    color:var(--text-secondary);
+    display:inline-flex;
+}
+
+@media (max-width:600px){
+    .league-clubs-table thead th:nth-child(3),
+    .league-clubs-table td:nth-child(3){
+        display:none;
+    }
+}
+
+@media (max-width:900px){
+    .league-clubs-page{
+        padding:80px 5% 48px;
+    }
+
+    .league-clubs-header h1{
+        font-size:1.5rem;
+    }
+}

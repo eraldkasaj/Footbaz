@@ -122,13 +122,78 @@
     padding:56px 0;
 }
 
-.clubs-grid{
+.clubs-leagues-grid{
     position:relative;
     z-index:1;
 
     max-width:1100px;
     margin:0 auto;
 
+    display:flex;
+    align-items:flex-start;
+    gap:28px;
+}
+
+.clubs-leagues-col{
+    flex:1;
+    min-width:0;
+
+    display:flex;
+    flex-direction:column;
+    gap:32px;
+}
+
+.clubs-league-section{
+    margin:0;
+}
+
+.clubs-league-header{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    column-gap:10px;
+    row-gap:4px;
+    margin-bottom:18px;
+    padding-bottom:12px;
+    border-bottom:1px solid var(--border);
+
+    text-decoration:none;
+    cursor:pointer;
+    transition:border-color .2s ease;
+}
+
+.clubs-league-header:hover{
+    border-bottom-color:var(--brand-teal);
+}
+
+.clubs-league-header:hover h2{
+    color:var(--brand-teal);
+}
+
+.clubs-league-eyebrow{
+    width:100%;
+    display:block;
+    color:var(--brand-teal);
+    font-size:0.72rem;
+    font-weight:700;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+}
+
+.clubs-league-header h2{
+    color:var(--text-primary);
+    font-size:1.3rem;
+    font-weight:800;
+    margin:0;
+}
+
+.clubs-league-count{
+    color:var(--text-secondary);
+    font-size:0.85rem;
+    margin-left:auto;
+}
+
+.clubs-grid{
     display:grid;
     grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
     gap:20px;
@@ -145,5 +210,10 @@
 
     .clubs-search-input{
         width:100%;
+    }
+
+    .clubs-leagues-grid{
+        flex-direction:column;
+        gap:32px;
     }
 }

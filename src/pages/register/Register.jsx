@@ -112,6 +112,7 @@ function Register() {
         await set(ref(db, "clubs/" + user.uid), {
           profile: {
             name,
+            league: "",
             city: "",
             country: "",
             foundedYear: "",

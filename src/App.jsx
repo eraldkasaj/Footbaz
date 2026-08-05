@@ -4,6 +4,7 @@ import Player_Scout from "./pages/player_scout/Player_Scout";
 import Players from "./pages/players/Players";
 import Player_Profile from "./pages/player_profile/Player_Profile";
 import Clubs from "./pages/clubs/Clubs";
+import League_Clubs from "./pages/league_clubs/League_Clubs";
 import Club_Profile from "./pages/club_profile/Club_Profile";
 import Login from "./pages/login/Login";
 import Register from "./pages/register/Register";
@@ -31,6 +32,7 @@ function App() {
     <Route path="/players" element={<Players />} />
     <Route path="/players/:id" element={<Player_Profile />} />
     <Route path="/clubs" element={<Clubs />} />
+    <Route path="/clubs/league/:league" element={<League_Clubs />} />
     <Route path="/clubs/:id" element={<Club_Profile />} />
     <Route path="/login" element={<Login />} />
     <Route path="/register" element={<Register />} />

@@ -8,6 +8,8 @@ import { ref,get,update } from "firebase/database";
 
 import { useNavigate } from "react-router-dom";
 
+import { LEAGUE_OPTIONS } from "../../data/leagues";
+
 
 function Edit_Club_Profile(){
 
@@ -16,6 +18,7 @@ const navigate = useNavigate();
 
 
 const [name,setName] = useState("");
+const [league,setLeague] = useState("");
 const [city,setCity] = useState("");
 const [country,setCountry] = useState("");
 const [foundedYear,setFoundedYear] = useState("");
@@ -61,6 +64,8 @@ const profileData = data.profile || {};
 
 
 setName(profileData.name || "");
+
+setLeague(profileData.league || "");
 
 setCity(profileData.city || "");
 
@@ -162,6 +167,8 @@ ref(db,"clubs/" + user.uid + "/profile"),
 {
 
 name,
+
+league,
 
 city,
 
@@ -305,6 +312,34 @@ onChange={(e)=>setName(e.target.value)}
 placeholder="p.sh. FK Partizani"
 
 />
+
+</div>
+
+
+
+
+<div className="form-group">
+
+<label>Kampionati</label>
+
+
+<select
+
+value={league}
+
+onChange={(e)=>setLeague(e.target.value)}
+
+>
+
+<option value="">Zgjidh kampionatin</option>
+
+{LEAGUE_OPTIONS.map((option)=>(
+
+<option key={option} value={option}>{option}</option>
+
+))}
+
+</select>
 
 </div>
 
