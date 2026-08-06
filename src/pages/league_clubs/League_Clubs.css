@@ -14,8 +14,9 @@
 }
 
 .league-clubs-back{
-    display:inline-flex;
+    display:flex;
     align-items:center;
+    justify-content:center;
     gap:6px;
 
     color:var(--text-secondary);
