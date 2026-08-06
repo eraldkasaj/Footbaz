@@ -12,6 +12,8 @@ import { ref, set } from "firebase/database";
 
 import { LuArrowLeft } from "react-icons/lu";
 
+import { calculateAgeFromBirthdate } from "../../utils/age";
+
 
 
 function Register() {
@@ -22,6 +24,10 @@ function Register() {
 
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
+  const [birthdate, setBirthdate] = useState("");
+  const [parentEmail, setParentEmail] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [parentConsent, setParentConsent] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -29,6 +35,11 @@ function Register() {
   const [success, setSuccess] = useState("");
   const [role, setRole] = useState("player");
   const [emailFocused, setEmailFocused] = useState(false);
+
+  // Vetëm për rolin "player": llogaritet nga datëlindja e futur, për të
+  // vendosur nëse duhet kërkuar email + pëlqim i prindit/kujdestarit.
+  const playerAge = role === "player" ? calculateAgeFromBirthdate(birthdate) : null;
+  const isMinor = playerAge !== null && playerAge < 18;
 
 
 
@@ -40,7 +51,7 @@ function Register() {
     setError("");
     setSuccess("");
 
-    const missingPlayerFields = role === "player" && (!name || !surname);
+    const missingPlayerFields = role === "player" && (!name || !surname || !birthdate);
     const missingClubFields = role === "club" && !name;
 
     if (missingPlayerFields || missingClubFields || !email || !password || !confirmPassword) {
@@ -54,6 +65,22 @@ function Register() {
     if (password !== confirmPassword) {
 
       setError("Fjalëkalimet nuk përputhen.");
+
+      return;
+
+    }
+
+    if (!acceptedTerms) {
+
+      setError("Duhet të pranosh Kushtet e Përdorimit dhe Politikën e Privatësisë për të vazhduar.");
+
+      return;
+
+    }
+
+    if (role === "player" && isMinor && (!parentEmail || !parentConsent)) {
+
+      setError("Meqë je nën 18 vjeç, duhet email i prindit/kujdestarit dhe pëlqimi i tij për të vazhduar.");
 
       return;
 
@@ -89,8 +116,8 @@ function Register() {
           profile: {
             name,
             surname,
-            age: "",
-            birthdate: "",
+            age: calculateAgeFromBirthdate(birthdate) ?? "",
+            birthdate,
             nationality: "",
             position: "",
             club: "",
@@ -104,6 +131,13 @@ function Register() {
           career: {},
           statistics: {},
           videos: {},
+          consent: {
+            acceptedTerms: true,
+            acceptedAt: new Date().toISOString(),
+            isMinor,
+            parentEmail: isMinor ? parentEmail : "",
+            parentConsent: isMinor ? parentConsent : false,
+          },
           createdAt: new Date().toISOString(),
         });
       }
@@ -120,6 +154,10 @@ function Register() {
             contactEmail: email,
             contactPhone: "",
             photoURL: "",
+          },
+          consent: {
+            acceptedTerms: true,
+            acceptedAt: new Date().toISOString(),
           },
           createdAt: new Date().toISOString(),
         });
@@ -266,6 +304,39 @@ function Register() {
             />
           )}
 
+          {role === "player" && (
+            <input
+              type="date"
+              placeholder="Datëlindja"
+              value={birthdate}
+              onChange={(e) => setBirthdate(e.target.value)}
+            />
+          )}
+
+          {role === "player" && isMinor && (
+            <>
+              <input
+                type="email"
+                placeholder="Email i prindit/kujdestarit"
+                value={parentEmail}
+                onChange={(e) => setParentEmail(e.target.value)}
+              />
+
+              <p className="register-hint">
+                Meqë je nën 18 vjeç, na duhet email i prindit/kujdestarit tënd. Regjistrimi lejohet vetëm me pëlqimin e tij.
+              </p>
+
+              <label className="register-checkbox">
+                <input
+                  type="checkbox"
+                  checked={parentConsent}
+                  onChange={(e) => setParentConsent(e.target.checked)}
+                />
+                Prindi/kujdestari im pranon Kushtet e Përdorimit dhe Politikën e Privatësisë të Footbaz për llogarinë time.
+              </label>
+            </>
+          )}
+
 
 
 
@@ -357,11 +428,17 @@ function Register() {
 
           </div>
 
-
-
-
-
-
+          <label className="register-checkbox">
+            <input
+              type="checkbox"
+              checked={acceptedTerms}
+              onChange={(e) => setAcceptedTerms(e.target.checked)}
+            />
+            Pranoj{" "}
+            <Link to="/terms" target="_blank" rel="noopener noreferrer">Kushtet e Përdorimit</Link>
+            {" "}dhe{" "}
+            <Link to="/privacy" target="_blank" rel="noopener noreferrer">Politikën e Privatësisë</Link>.
+          </label>
 
           <button type="submit">
 

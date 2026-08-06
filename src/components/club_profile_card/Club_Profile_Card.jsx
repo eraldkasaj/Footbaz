@@ -19,6 +19,9 @@ function Club_Profile_Card({ club }) {
         <div className="club-profile-info">
           <h1>{profile.name || "Klub"}</h1>
           <span className="club-profile-role">Klub</span>
+          {profile.isDemo && (
+            <span className="club-profile-demo-badge">Profil Demo — Jozyrtar</span>
+          )}
 
           <div className="club-profile-details">
             <div className="club-detail-card">

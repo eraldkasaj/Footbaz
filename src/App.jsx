@@ -20,6 +20,8 @@ import Visits from "./pages/visits/Visits";
 import Settings from "./pages/settings/Settings";
 import Player_Settings from "./pages/player_settings/Player_Settings";
 import Forgot_Password from "./pages/forgot_password/Forgot_Password";
+import Terms from "./pages/legal/Terms";
+import Privacy from "./pages/legal/Privacy";
 import {Routes ,Route} from 'react-router-dom'
 
 
@@ -48,6 +50,8 @@ function App() {
     <Route path="/settings" element={<Settings />} />
     <Route path="/player-settings" element={<Player_Settings />} />
     <Route path="/forgot-password" element={<Forgot_Password/>} />
+    <Route path="/terms" element={<Terms />} />
+    <Route path="/privacy" element={<Privacy />} />
 
    </Routes>
       

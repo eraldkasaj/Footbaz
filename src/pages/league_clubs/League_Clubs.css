@@ -151,6 +151,17 @@
     object-fit:cover;
 }
 
+.league-clubs-demo-badge{
+    display:inline-block;
+    color:#d9a441;
+    background:rgba(217,164,65,.12);
+    border:1px solid rgba(217,164,65,.35);
+    border-radius:6px;
+    padding:1px 6px;
+    font-size:0.68rem;
+    font-weight:700;
+}
+
 .league-clubs-city{
     color:var(--text-secondary);
 }

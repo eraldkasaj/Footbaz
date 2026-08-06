@@ -51,7 +51,10 @@ function Footer() {
 
       <div className="footer-bottom">
         <span>© 2026 Footbaz. Të gjitha të drejtat e rezervuara.</span>
-        <span>Ndërtuar për futbollin shqiptar.</span>
+        <span className="footer-legal-links">
+          <Link to="/terms">Kushtet e Përdorimit</Link>
+          <Link to="/privacy">Politika e Privatësisë</Link>
+        </span>
       </div>
     </footer>
   );

@@ -50,6 +50,20 @@
   margin-bottom: 12px;
 }
 
+.club-profile-demo-badge {
+  display: inline-block;
+  color: #d9a441;
+  background: rgba(217, 164, 65, 0.12);
+  border: 1px solid rgba(217, 164, 65, 0.35);
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  margin-left: 10px;
+  margin-bottom: 12px;
+  vertical-align: middle;
+}
+
 .club-profile-details {
   display: flex;
   flex-wrap: wrap;

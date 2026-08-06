@@ -87,6 +87,9 @@ function League_Clubs() {
                             )}
                           </span>
                           <span>{profile.name || "Klub"}</span>
+                          {profile.isDemo && (
+                            <span className="league-clubs-demo-badge">Demo</span>
+                          )}
                         </Link>
                       </td>
                       <td className="league-clubs-city">{location || "—"}</td>
