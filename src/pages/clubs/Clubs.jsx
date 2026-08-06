@@ -11,7 +11,7 @@ import { LEAGUE_OPTIONS } from "../../data/leagues";
 // Superiore, të gjitha moshat, + Superiore Vajza) — shfaqen në kolonën e
 // majtë. Pjesa tjetër (Kategoria e Parë e poshtë, me moshat e saj, etj.)
 // shkon në kolonën e djathtë.
-const SUPERLIGA_FAMILY = new Set(LEAGUE_OPTIONS.slice(0, 8));
+const SUPERLIGA_FAMILY = new Set(LEAGUE_OPTIONS.slice(0, 7));
 
 function Clubs() {
   const [clubs, setClubs] = useState([]);
