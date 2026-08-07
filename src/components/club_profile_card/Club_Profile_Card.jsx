@@ -40,21 +40,25 @@ function Club_Profile_Card({ club }) {
               </div>
             </div>
 
-            <div className="club-detail-card">
-              <LuMail />
-              <div>
-                <span>Email</span>
-                <h3>{profile.contactEmail || "—"}</h3>
+            {profile.contactEmail && (
+              <div className="club-detail-card">
+                <LuMail />
+                <div>
+                  <span>Email</span>
+                  <h3>{profile.contactEmail}</h3>
+                </div>
               </div>
-            </div>
+            )}
 
-            <div className="club-detail-card">
-              <LuPhone />
-              <div>
-                <span>Telefon</span>
-                <h3>{profile.contactPhone || "—"}</h3>
+            {profile.contactPhone && (
+              <div className="club-detail-card">
+                <LuPhone />
+                <div>
+                  <span>Telefon</span>
+                  <h3>{profile.contactPhone}</h3>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
