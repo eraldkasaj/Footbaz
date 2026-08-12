@@ -110,3 +110,30 @@
   font-size: 0.92rem;
   line-height: 1.6;
 }
+
+@media (max-width: 600px) {
+  .club-profile-card {
+    padding: 22px 18px;
+    border-radius: 16px;
+  }
+
+  .club-profile-top {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    gap: 16px;
+  }
+
+  .club-profile-logo {
+    width: 88px;
+    height: 88px;
+  }
+
+  .club-profile-info h1 {
+    font-size: 1.3rem;
+  }
+
+  .club-profile-details {
+    gap: 14px;
+  }
+}

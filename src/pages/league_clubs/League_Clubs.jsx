@@ -271,7 +271,7 @@ function League_Clubs() {
             )}
           </div>
 
-          {!loading && clubs.length > 0 && (
+          {!loading && (
             <div className="league-clubs-header-right">
               <div className="league-clubs-matches-panel">
                 <h2>Ndeshjet</h2>
