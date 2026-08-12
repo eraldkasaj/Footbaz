@@ -18,6 +18,8 @@ import {
 import { getPlayerAge } from "../../utils/age";
 import { getNationalityFlag } from "../../utils/nationality";
 import { formatDateShort } from "../../utils/time";
+import { getSquadPlayers, computeSquadStats } from "../../utils/squad";
+import { computeStandings } from "../../utils/standings";
 
 function League_Clubs() {
   const { league: leagueParam } = useParams();
@@ -56,29 +58,13 @@ function League_Clubs() {
           .map((uid) => ({ uid, ...data[uid] }))
           .filter((club) => club.profile?.league === league)
           .map((club) => {
-            // Skuadra e klubit = lojtarët në rosterin e tij (clubs/{uid}/roster).
-            // Shumica e klubeve demo ende s'kanë roster real, kështu që kjo
-            // del "—" derisa klube reale të shtojnë lojtarë.
-            const rosterIds = Object.keys(club.roster || {});
-            const squadPlayers = rosterIds
-              .map((id) => (playersById[id] ? { uid: id, ...playersById[id] } : null))
-              .filter(Boolean);
-
-            const ages = squadPlayers
-              .map((player) => getPlayerAge(player.profile))
-              .filter((value) => value !== null);
-
-            const avgAge =
-              ages.length > 0 ? ages.reduce((sum, value) => sum + value, 0) / ages.length : null;
-
-            const foreigners = squadPlayers.filter(
-              (player) => player.profile?.nationality && player.profile.nationality !== "Albania"
-            ).length;
+            const squadPlayers = getSquadPlayers(club, playersById);
+            const { squadSize, avgAge, foreigners } = computeSquadStats(squadPlayers);
 
             return {
               ...club,
               squadPlayers,
-              squadSize: rosterIds.length,
+              squadSize,
               avgAge,
               foreigners,
             };
@@ -133,49 +119,8 @@ function League_Clubs() {
     );
   };
 
-  // Tabela e klasifikimit — llogaritet nga ndeshjet e vetë-raportuara të çdo
-  // klubi (clubs/{uid}/matches, status:"played"), njësoj si te Statistikat e
-  // Club Dashboard. Klubet demo pa asnjë ndeshje dalin me 0 kudo, njësoj si
-  // një kampionat që ende s'ka filluar.
-  const standings = useMemo(() => {
-    return clubs
-      .map((club) => {
-        const played = Object.values(club.matches || {}).filter(
-          (match) => match.status === "played"
-        );
-
-        const stats = played.reduce(
-          (acc, match) => {
-            acc.goalsFor += Number(match.ourScore) || 0;
-            acc.goalsAgainst += Number(match.opponentScore) || 0;
-
-            if (match.ourScore > match.opponentScore) acc.wins += 1;
-            else if (match.ourScore === match.opponentScore) acc.draws += 1;
-            else acc.losses += 1;
-
-            return acc;
-          },
-          { wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0 }
-        );
-
-        const points = stats.wins * 3 + stats.draws;
-        const goalDiff = stats.goalsFor - stats.goalsAgainst;
-
-        // Forma — rezultati i 5 ndeshjeve të fundit të luajtura, nga më e
-        // vjetra te më e reja (majtas-djathtas), sipas datës.
-        const form = [...played]
-          .sort((a, b) => new Date(a.date) - new Date(b.date))
-          .slice(-5)
-          .map((match) => {
-            if (match.ourScore > match.opponentScore) return "F";
-            if (match.ourScore === match.opponentScore) return "B";
-            return "H";
-          });
-
-        return { ...club, ...stats, points, goalDiff, played: played.length, form };
-      })
-      .sort((a, b) => b.points - a.points || b.goalDiff - a.goalDiff || b.goalsFor - a.goalsFor);
-  }, [clubs]);
+  // Tabela e klasifikimit, njësoj si te Statistikat e Club Dashboard.
+  const standings = useMemo(() => computeStandings(clubs), [clubs]);
 
   // Golashënuesit — nga statistikat e vetë-raportuara të lojtarëve
   // (players/{uid}/statistics/goals, plotësuar te faqja "Statistikat" e
@@ -361,6 +306,7 @@ function League_Clubs() {
             </div>
 
             {activeTab === "overview" && (
+              <div className="league-clubs-table-scroll">
               <table className="league-clubs-table league-clubs-table--overview">
                 <thead>
                   <tr>
@@ -420,9 +366,11 @@ function League_Clubs() {
                   })}
                 </tbody>
               </table>
+              </div>
             )}
 
             {activeTab === "table" && (
+              <div className="league-clubs-table-scroll">
               <table className="league-clubs-table league-clubs-table--standings">
                 <thead>
                   <tr>
@@ -486,12 +434,14 @@ function League_Clubs() {
                   })}
                 </tbody>
               </table>
+              </div>
             )}
 
             {activeTab === "scorers" && (
               topScorers.length === 0 ? (
                 <p className="league-clubs-empty">Ende s'ka gola të regjistruar në këtë kampionat.</p>
               ) : (
+                <div className="league-clubs-table-scroll">
                 <table className="league-clubs-table league-clubs-table--scorers">
                   <thead>
                     <tr>
@@ -525,6 +475,7 @@ function League_Clubs() {
                     ))}
                   </tbody>
                 </table>
+                </div>
               )
             )}
 
@@ -532,6 +483,7 @@ function League_Clubs() {
               allLeagueMatches.length === 0 ? (
                 <p className="league-clubs-empty">Ende s'ka ndeshje të regjistruara në këtë kampionat.</p>
               ) : (
+                <div className="league-clubs-table-scroll">
                 <table className="league-clubs-table league-clubs-table--matches">
                   <thead>
                     <tr>
@@ -567,6 +519,7 @@ function League_Clubs() {
                     })}
                   </tbody>
                 </table>
+                </div>
               )
             )}
           </div>

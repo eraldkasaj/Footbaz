@@ -227,12 +227,34 @@
     overflow:hidden;
 }
 
+.league-clubs-table-scroll{
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+}
+
+.league-clubs-table-scroll .league-clubs-table{
+    min-width:560px;
+}
+
+.league-clubs-table-scroll .league-clubs-table--overview,
+.league-clubs-table-scroll .league-clubs-table--standings{
+    min-width:520px;
+}
+
 .league-clubs-tabs{
     display:flex;
     gap:4px;
 
     padding:14px 16px 0;
     border-bottom:1px solid var(--border);
+
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+}
+
+.league-clubs-tabs::-webkit-scrollbar{
+    display:none;
 }
 
 .league-clubs-tab{
@@ -248,6 +270,8 @@
     font-weight:700;
     letter-spacing:0.02em;
     text-transform:uppercase;
+    white-space:nowrap;
+    flex-shrink:0;
 
     transition:color .2s ease;
 }
