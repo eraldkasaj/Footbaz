@@ -92,8 +92,11 @@ function Club_Profile_Card({ club, squadPlayers, squadStats, standing }) {
       uid: player.uid,
       name: [player.profile?.name, player.profile?.surname].filter(Boolean).join(" ") || "Lojtar",
       photoURL: player.profile?.photoURL,
+      matches: Number(player.statistics?.matches) || 0,
       goals: Number(player.statistics?.goals) || 0,
       assists: Number(player.statistics?.assists) || 0,
+      yellowCards: Number(player.statistics?.yellowCards) || 0,
+      redCards: Number(player.statistics?.redCards) || 0,
     }))
     .filter((player) => player.goals > 0 || player.assists > 0)
     .sort((a, b) => b.goals + b.assists - (a.goals + a.assists));
@@ -114,10 +117,6 @@ function Club_Profile_Card({ club, squadPlayers, squadStats, standing }) {
           <span className="club-profile-league">
             {profile.league || "Kampionati nuk është vendosur"}
           </span>
-          {profile.isDemo && (
-            <span className="club-profile-demo-badge">Profil Demo — Jozyrtar</span>
-          )}
-
           <div className="club-profile-details">
             <div className="club-detail-card">
               <LuUsers />
@@ -156,10 +155,7 @@ function Club_Profile_Card({ club, squadPlayers, squadStats, standing }) {
                 <LuListOrdered />
                 <div>
                   <span>Pozicioni në tabelë</span>
-                  <h3>
-                    {standing.position ?? "—"}
-                    {standing.total ? ` nga ${standing.total}` : ""}
-                  </h3>
+                  <h3>{standing.position ? `#${standing.position}` : "—"}</h3>
                 </div>
               </div>
             )}
@@ -367,8 +363,11 @@ function Club_Profile_Card({ club, squadPlayers, squadStats, standing }) {
                   <tr>
                     <th className="club-squad-rank">#</th>
                     <th>Lojtari</th>
+                    <th className="club-squad-center">Ndeshje</th>
                     <th className="club-squad-center">Gola</th>
                     <th className="club-squad-center">Asistime</th>
+                    <th className="club-squad-center">Kart. Verdhë</th>
+                    <th className="club-squad-center">Kart. Kuq</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -385,8 +384,11 @@ function Club_Profile_Card({ club, squadPlayers, squadStats, standing }) {
                           </span>
                         </Link>
                       </td>
+                      <td className="club-squad-center">{player.matches}</td>
                       <td className="club-squad-center club-squad-points">{player.goals}</td>
                       <td className="club-squad-center">{player.assists}</td>
+                      <td className="club-squad-center club-squad-card--yellow">{player.yellowCards}</td>
+                      <td className="club-squad-center club-squad-card--red">{player.redCards}</td>
                     </tr>
                   ))}
                 </tbody>

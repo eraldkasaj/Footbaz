@@ -1,6 +1,5 @@
 .club-profile-card {
-  max-width: 1100px;
-  margin: 0 auto;
+  width: 100%;
   background: var(--bg-secondary);
   border: 1px solid var(--border);
   border-radius: 20px;
@@ -53,20 +52,6 @@
   font-size: 0.9rem;
   font-weight: 500;
   margin-bottom: 12px;
-}
-
-.club-profile-demo-badge {
-  display: inline-block;
-  color: #d9a441;
-  background: rgba(217, 164, 65, 0.12);
-  border: 1px solid rgba(217, 164, 65, 0.35);
-  border-radius: 6px;
-  padding: 2px 8px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  margin-left: 10px;
-  margin-bottom: 12px;
-  vertical-align: middle;
 }
 
 .club-profile-details {
@@ -148,9 +133,6 @@
 }
 
 .club-squad-table-scroll {
-  border: 1px solid var(--border);
-  border-radius: 10px;
-
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -264,6 +246,10 @@
   color: var(--text-secondary);
 }
 
+.club-squad-table thead th.club-squad-center {
+  text-align: center;
+}
+
 .club-squad-sortable {
   cursor: pointer;
   user-select: none;
@@ -291,6 +277,16 @@
 .club-squad-points {
   color: var(--text-primary);
   font-weight: 800;
+}
+
+.club-squad-card--yellow {
+  color: #d9a441;
+  font-weight: 700;
+}
+
+.club-squad-card--red {
+  color: #ef4444;
+  font-weight: 700;
 }
 
 .club-record-grid {
@@ -394,8 +390,32 @@
 
 @media (max-width: 600px) {
   .club-profile-card {
-    padding: 22px 18px;
+    padding: 22px 12px;
     border-radius: 16px;
+  }
+
+  .club-squad-table-scroll {
+    -webkit-mask-image: linear-gradient(to right, black calc(100% - 24px), transparent 100%);
+    mask-image: linear-gradient(to right, black calc(100% - 24px), transparent 100%);
+  }
+
+  .club-squad-table {
+    min-width: 460px;
+  }
+
+  .club-squad-table thead th {
+    padding: 8px 8px;
+    font-size: 0.62rem;
+  }
+
+  .club-squad-table td {
+    padding: 8px 8px;
+    font-size: 0.78rem;
+  }
+
+  .club-squad-photo {
+    width: 26px;
+    height: 26px;
   }
 
   .club-profile-top {
@@ -415,7 +435,9 @@
   }
 
   .club-profile-details {
-    gap: 14px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 14px;
   }
 
   .club-tabs {

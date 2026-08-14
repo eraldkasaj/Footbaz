@@ -483,22 +483,76 @@
 }
 
 @media (max-width:700px){
-    .league-clubs-table--overview thead th:nth-child(4),
-    .league-clubs-table--overview td:nth-child(4),
-    .league-clubs-table--overview thead th:nth-child(5),
-    .league-clubs-table--overview td:nth-child(5),
-    .league-clubs-table--overview thead th:nth-child(6),
-    .league-clubs-table--overview td:nth-child(6){
-        display:none;
+    .league-clubs-table-scroll{
+        -webkit-mask-image:linear-gradient(to right, black calc(100% - 28px), transparent 100%);
+        mask-image:linear-gradient(to right, black calc(100% - 28px), transparent 100%);
     }
 
-    .league-clubs-table--standings thead th:nth-child(3),
-    .league-clubs-table--standings td:nth-child(3),
+    /* Standings në mobile: si Flashscore — vetëm # / Klub / Nr / Gola / Pikë,
+       pa scroll horizontal, F/B/H/+/-/Forma fshihen. */
+    .league-clubs-table-scroll:has(.league-clubs-table--standings){
+        -webkit-mask-image:none;
+        mask-image:none;
+    }
+
+    .league-clubs-table-scroll .league-clubs-table--standings{
+        min-width:0;
+    }
+
     .league-clubs-table--standings thead th:nth-child(4),
     .league-clubs-table--standings td:nth-child(4),
     .league-clubs-table--standings thead th:nth-child(5),
-    .league-clubs-table--standings td:nth-child(5){
+    .league-clubs-table--standings td:nth-child(5),
+    .league-clubs-table--standings thead th:nth-child(6),
+    .league-clubs-table--standings td:nth-child(6),
+    .league-clubs-table--standings thead th:nth-child(8),
+    .league-clubs-table--standings td:nth-child(8),
+    .league-clubs-table--standings thead th:nth-child(10),
+    .league-clubs-table--standings td:nth-child(10){
         display:none;
+    }
+
+    .league-clubs-table--standings .league-clubs-points{
+        color:var(--brand-teal);
+        font-weight:800;
+    }
+
+    .league-clubs-demo-badge{
+        display:none;
+    }
+
+    .league-clubs-table thead th{
+        padding:8px 8px;
+        font-size:0.62rem;
+    }
+
+    .league-clubs-table td{
+        padding:8px 8px;
+        font-size:0.78rem;
+    }
+
+    .league-clubs-rank{
+        width:24px;
+    }
+
+    .league-clubs-club{
+        min-width:0;
+    }
+
+    .league-clubs-club-link{
+        gap:8px;
+    }
+
+    .league-clubs-logo{
+        width:22px;
+        height:22px;
+        border-radius:6px;
+    }
+
+    .league-clubs-form-badge{
+        width:16px;
+        height:16px;
+        font-size:0.6rem;
     }
 }
 

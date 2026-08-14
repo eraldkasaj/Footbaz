@@ -376,6 +376,7 @@ function League_Clubs() {
                   <tr>
                     <th className="league-clubs-rank">#</th>
                     <th className="league-clubs-club">Klub</th>
+                    <th className="league-clubs-numeric">Nr</th>
                     <th className="league-clubs-numeric">F</th>
                     <th className="league-clubs-numeric">B</th>
                     <th className="league-clubs-numeric">H</th>
@@ -407,6 +408,7 @@ function League_Clubs() {
                             )}
                           </Link>
                         </td>
+                        <td className="league-clubs-numeric">{club.played}</td>
                         <td className="league-clubs-numeric">{club.wins}</td>
                         <td className="league-clubs-numeric">{club.draws}</td>
                         <td className="league-clubs-numeric">{club.losses}</td>

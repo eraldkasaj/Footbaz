@@ -1,7 +1,13 @@
 .club-profile {
   min-height: 100vh;
   background: var(--bg-primary);
-  padding: 96px 6% 64px;
+  padding: 96px 24px 64px;
+}
+
+@media (max-width: 900px) {
+  .club-profile {
+    padding: 80px 16px 48px;
+  }
 }
 
 .club-profile-loading {
