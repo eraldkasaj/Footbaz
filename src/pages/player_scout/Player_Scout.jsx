@@ -4,7 +4,7 @@ import Navbar from "../../components/navbar/Navbar";
 
 import { Link } from "react-router-dom";
 
-import { LuUsers, LuSearch, LuArrowRight } from "react-icons/lu";
+import { LuUsers, LuShield, LuArrowRight } from "react-icons/lu";
 
 
 function Player_Scout() {
@@ -23,7 +23,7 @@ function Player_Scout() {
 
           <span className="player-scout-eyebrow">Zgjidh rrugën tënde</span>
 
-          <h1>Player & Scout</h1>
+          <h1>Player & Club</h1>
 
           <p>
 
@@ -70,43 +70,34 @@ function Player_Scout() {
           </div>
 
 
-          <div className="category-card category-card--soon">
-
-            <span className="category-badge">Së shpejti</span>
+          <div className="category-card">
 
             <div className="category-icon">
 
-              <LuSearch />
+              <LuShield />
 
             </div>
 
 
-            <h2>Scoutët</h2>
+            <h2>Klubet</h2>
 
 
             <p>
 
-              Zbulo scoutët dhe lidhu
+              Zbulo klubet e platformës
 
-              me profesionistë të futbollit.
+              dhe profilet e tyre.
 
             </p>
 
 
-            <button type="button" className="category-btn category-btn--disabled" disabled>
+            <Link to="/clubs" className="category-btn">
 
-              Shiko Scoutët
+              Shiko Klubet
 
               <LuArrowRight className="category-btn-icon" />
 
-            </button>
-
-
-            <span className="category-soon-note">
-
-              Kjo veçori do të aktivizohet së shpejti.
-
-            </span>
+            </Link>
 
 
           </div>

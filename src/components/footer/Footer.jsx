@@ -8,12 +8,12 @@ function Footer() {
     <footer className="footer">
       <div className="footer-main">
         <div className="footer-top">
-          <Link to="/" aria-label="Talento11 - Faqja kryesore">
-            <img src={logo_img} alt="Talento11" className="footer-logo" />
+          <Link to="/" aria-label="Footbaz - Faqja kryesore">
+            <img src={logo_img} alt="Footbaz" className="footer-logo" />
           </Link>
 
           <p className="footer-description">
-            Shfaq talentin tënd. Lidhu me scoutë, akademi dhe klube futbolli.
+            Shfaq talentin tënd. Lidhu me klube dhe akademi futbolli.
           </p>
 
           <span className="footer-tagline">TALENTI YT, MUNDËSIA JOTE</span>
@@ -31,7 +31,7 @@ function Footer() {
             <h3>Llogaria</h3>
             <Link to="/login">Hyr</Link>
             <Link to="/register">Regjistrohu</Link>
-            <Link to="/player-scout">Scoutët</Link>
+            <Link to="/clubs">Klubet</Link>
           </div>
 
           <div className="footer-column">
@@ -51,7 +51,10 @@ function Footer() {
 
       <div className="footer-bottom">
         <span>© 2026 Footbaz. Të gjitha të drejtat e rezervuara.</span>
-        <span>Ndërtuar për futbollin shqiptar.</span>
+        <span className="footer-legal-links">
+          <Link to="/terms">Kushtet e Përdorimit</Link>
+          <Link to="/privacy">Politika e Privatësisë</Link>
+        </span>
       </div>
     </footer>
   );

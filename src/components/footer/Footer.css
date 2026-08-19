@@ -81,6 +81,21 @@
   font-size: 0.82rem;
 }
 
+.footer-legal-links {
+  display: flex;
+  gap: 20px;
+}
+
+.footer-legal-links a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.25s ease;
+}
+
+.footer-legal-links a:hover {
+  color: var(--brand-teal);
+}
+
 @media (max-width: 1100px) {
   .footer { padding: 64px 40px 26px; }
   .footer-main { grid-template-columns: 1fr; gap: 46px; }

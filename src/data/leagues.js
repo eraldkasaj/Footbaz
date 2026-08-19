@@ -3,8 +3,6 @@
 // Karriera modal's league) so players pick from a real list instead of
 // typing free text. Shared here so both places stay in sync.
 export const LEAGUE_OPTIONS = [
-  "Abissnet Superiore",
-  "Abissnet Superiore U-21",
   "U-19 Abissnet Superiore",
   "U-17 Abissnet Superiore",
   "U-16 Abissnet Superiore",
@@ -12,23 +10,14 @@ export const LEAGUE_OPTIONS = [
   "U-14 Abissnet Superiore",
   "U-13 Abissnet Superiore",
   "Superiore Vajza",
-  "Kategoria e Parë",
   "Kategoria e Parë U-19",
-  "Kategoria e Dytë U-19",
   "Kategoria e Parë U-17",
-  "Kategoria e Dytë U-17",
   "Kategoria e Parë U-15",
   "Kategoria e Dytë U-15",
   "Kategoria e Parë U-14",
   "Kategoria e Dytë U-14",
   "Kategoria e Parë U-13",
   "Kategoria e Dytë U-13",
-  "Kategoria e Dytë A",
-  "Kategoria e Dytë B",
-  "Kategoria e Tretë",
-  "Fustal League",
-  "5x5",
-  "Kupa e Shqipërisë",
 ];
 
 export default LEAGUE_OPTIONS;

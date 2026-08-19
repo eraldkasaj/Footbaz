@@ -22,9 +22,11 @@ function Dashboard() {
             Paneli i Lojtarit
         </Link>
 
-          <button>
-            Paneli i Scout-it
-          </button>
+          <Link
+            to="/club-dashboard"
+            className="dashboard-btn" >
+            Paneli i Klubit
+        </Link>
 
         </div>
 

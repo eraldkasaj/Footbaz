@@ -72,9 +72,9 @@ function Login() {
 
           navigate("/player-dashboard");
 
-        } else if (userData.role === "scout") {
+        } else if (userData.role === "club") {
 
-          navigate("/scout-dashboard");
+          navigate("/club-dashboard");
 
         }
 
@@ -130,7 +130,7 @@ setError("Ndodhi një gabim. Provo përsëri.");
         <Link to="/">
           <img
             src={logo_img}
-            alt="Talento11"
+            alt="Footbaz"
             className="login-logo"
           />
         </Link>

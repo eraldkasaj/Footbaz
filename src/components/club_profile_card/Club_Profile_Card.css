@@ -1,0 +1,465 @@
+.club-profile-card {
+  width: 100%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px;
+}
+
+.club-profile-top {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.club-profile-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.club-profile-logo {
+  width: 110px;
+  height: 110px;
+  flex-shrink: 0;
+  border-radius: 18px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #263041, #0f1c31);
+  color: var(--text-secondary);
+  font-size: 2rem;
+}
+
+.club-profile-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.club-profile-info h1 {
+  margin: 0 0 4px;
+  color: var(--text-primary);
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+
+.club-profile-league {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.club-profile-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.club-detail-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.club-detail-card svg {
+  color: var(--brand-teal);
+  width: 18px;
+  height: 18px;
+}
+
+.club-detail-card span {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+}
+
+.club-detail-card h3 {
+  margin: 2px 0 0;
+  color: var(--text-primary);
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.club-tabs {
+  display: flex;
+  gap: 4px;
+
+  margin-top: 28px;
+  padding-bottom: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.club-tab {
+  padding: 10px 14px;
+
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+
+  transition: color 0.2s ease;
+}
+
+.club-tab:hover {
+  color: var(--text-primary);
+}
+
+.club-tab.active {
+  color: var(--brand-teal);
+  border-bottom-color: var(--brand-teal);
+}
+
+.club-tab-panel {
+  margin-top: 20px;
+}
+
+.club-squad-empty {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  text-align: center;
+
+  padding: 28px 16px;
+}
+
+.club-squad-table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.club-squad-table {
+  width: 100%;
+  min-width: 520px;
+  border-collapse: collapse;
+}
+
+.club-squad-table thead th {
+  text-align: left;
+  color: var(--text-secondary);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+
+  background: rgba(255, 255, 255, 0.03);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.club-squad-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  border-left: 3px solid transparent;
+  transition: background-color 0.2s ease;
+}
+
+.club-squad-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.club-squad-table tbody tr:hover {
+  background: rgba(23, 178, 106, 0.06);
+}
+
+.club-squad-table td {
+  padding: 10px 14px;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.club-squad-rank {
+  width: 32px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-align: center;
+}
+
+.club-squad-player-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  color: var(--text-primary);
+  text-decoration: none;
+  white-space: normal;
+}
+
+.club-squad-player-link strong {
+  display: block;
+  font-size: 0.87rem;
+  font-weight: 700;
+}
+
+.club-squad-player-link small {
+  display: block;
+  margin-top: 2px;
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+
+/* 4 ngjyrat sipas linjës së lojës: portier, mbrojtje, mesfushë, sulm */
+.club-squad-row--gk { border-left: 3px solid #d9a441; }
+.club-squad-row--def { border-left: 3px solid #3b82f6; }
+.club-squad-row--mid { border-left: 3px solid #22c55e; }
+.club-squad-row--fwd { border-left: 3px solid #ef4444; }
+
+.club-squad-position--gk { color: #d9a441 !important; }
+.club-squad-position--def { color: #3b82f6 !important; }
+.club-squad-position--mid { color: #22c55e !important; }
+.club-squad-position--fwd { color: #ef4444 !important; }
+
+.club-squad-photo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  overflow: hidden;
+
+  background: linear-gradient(145deg, #263041, #0f1c31);
+  color: var(--text-secondary);
+}
+
+.club-squad-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.club-squad-center {
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.club-squad-table thead th.club-squad-center {
+  text-align: center;
+}
+
+.club-squad-sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.2s ease;
+}
+
+.club-squad-sortable:hover {
+  color: var(--text-primary);
+}
+
+.club-squad-sort-icon {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 2px;
+  font-size: 0.8em;
+  color: var(--text-secondary);
+  opacity: 0.5;
+}
+
+.club-squad-sort-icon.active {
+  color: var(--brand-teal);
+  opacity: 1;
+}
+
+.club-squad-points {
+  color: var(--text-primary);
+  font-weight: 800;
+}
+
+.club-squad-card--yellow {
+  color: #d9a441;
+  font-weight: 700;
+}
+
+.club-squad-card--red {
+  color: #ef4444;
+  font-weight: 700;
+}
+
+.club-record-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.club-record-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+
+.club-record-card h3 {
+  color: var(--text-primary);
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+
+.club-record-card span {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-secondary);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.club-overview-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.club-overview-panel {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.club-overview-panel h4 {
+  color: var(--text-primary);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.club-goals-row {
+  display: flex;
+  gap: 20px;
+}
+
+.club-goals-row > div {
+  text-align: center;
+}
+
+.club-goals-row strong {
+  display: block;
+  color: var(--text-primary);
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.club-goals-row span {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+}
+
+.club-form-badges {
+  display: flex;
+  gap: 6px;
+}
+
+.club-form-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.club-form-badge--F { background: var(--brand-green); }
+.club-form-badge--B { background: #6b7280; }
+.club-form-badge--H { background: #ef4444; }
+
+@media (max-width: 600px) {
+  .club-profile-card {
+    padding: 22px 12px;
+    border-radius: 16px;
+  }
+
+  .club-squad-table-scroll {
+    -webkit-mask-image: linear-gradient(to right, black calc(100% - 24px), transparent 100%);
+    mask-image: linear-gradient(to right, black calc(100% - 24px), transparent 100%);
+  }
+
+  .club-squad-table {
+    min-width: 460px;
+  }
+
+  .club-squad-table thead th {
+    padding: 8px 8px;
+    font-size: 0.62rem;
+  }
+
+  .club-squad-table td {
+    padding: 8px 8px;
+    font-size: 0.78rem;
+  }
+
+  .club-squad-photo {
+    width: 26px;
+    height: 26px;
+  }
+
+  .club-profile-top {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    gap: 16px;
+  }
+
+  .club-profile-logo {
+    width: 88px;
+    height: 88px;
+  }
+
+  .club-profile-info h1 {
+    font-size: 1.3rem;
+  }
+
+  .club-profile-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 14px;
+  }
+
+  .club-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .club-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .club-tab {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .club-record-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .club-overview-row {
+    grid-template-columns: 1fr;
+  }
+}

@@ -85,7 +85,7 @@ function Pse_Talento11() {
         </div>
 
         <div className="app-preview">
-          <img src={mockup_img} alt="Preview i profilit të lojtarit në Talento11" className="mockup-img" />
+          <img src={mockup_img} alt="Preview i profilit të lojtarit në Footbaz" className="mockup-img" />
         </div>
 
       </section>
