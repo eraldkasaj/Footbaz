@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Navbar from "../../components/navbar/Navbar";
+import Club_Crest from "../../components/club_crest/Club_Crest";
 import "./League_Clubs.css";
 import { db } from "../../firebase/firebase";
 import { ref, get } from "firebase/database";
@@ -341,13 +342,10 @@ function League_Clubs() {
                               {profile.photoURL ? (
                                 <img src={profile.photoURL} alt={profile.name} />
                               ) : (
-                                <LuShield />
+                                <Club_Crest name={profile.name} seed={club.uid} />
                               )}
                             </span>
                             <span>{profile.name || "Klub"}</span>
-                            {profile.isDemo && (
-                              <span className="league-clubs-demo-badge">Demo</span>
-                            )}
                           </Link>
                         </td>
                         <td className="league-clubs-numeric">{club.squadSize || "—"}</td>
@@ -399,13 +397,10 @@ function League_Clubs() {
                               {profile.photoURL ? (
                                 <img src={profile.photoURL} alt={profile.name} />
                               ) : (
-                                <LuShield />
+                                <Club_Crest name={profile.name} seed={club.uid} />
                               )}
                             </span>
                             <span>{profile.name || "Klub"}</span>
-                            {profile.isDemo && (
-                              <span className="league-clubs-demo-badge">Demo</span>
-                            )}
                           </Link>
                         </td>
                         <td className="league-clubs-numeric">{club.played}</td>
