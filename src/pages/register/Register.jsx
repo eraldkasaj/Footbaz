@@ -35,6 +35,7 @@ function Register() {
   const [success, setSuccess] = useState("");
   const [role, setRole] = useState("player");
   const [emailFocused, setEmailFocused] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Vetëm për rolin "player": llogaritet nga datëlindja e futur, për të
   // vendosur nëse duhet kërkuar email + pëlqim i prindit/kujdestarit.
@@ -47,6 +48,8 @@ function Register() {
 
 
     e.preventDefault();
+
+    if (isSubmitting) return;
 
     setError("");
     setSuccess("");
@@ -86,6 +89,8 @@ function Register() {
 
     }
 
+
+    setIsSubmitting(true);
 
     try {
 
@@ -221,6 +226,8 @@ function Register() {
         setError("Ndodhi një gabim. Provo përsëri.");
 
       }
+
+      setIsSubmitting(false);
 
     }
 
@@ -440,9 +447,9 @@ function Register() {
             <Link to="/privacy" target="_blank" rel="noopener noreferrer">Politikën e Privatësisë</Link>.
           </label>
 
-          <button type="submit">
+          <button type="submit" disabled={isSubmitting}>
 
-            Regjistrohu
+            {isSubmitting ? "Duke u regjistruar..." : "Regjistrohu"}
 
           </button>
 
