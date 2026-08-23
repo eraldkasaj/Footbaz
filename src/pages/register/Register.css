@@ -94,7 +94,8 @@
 
 .register-form input[type="text"],
 .register-form input[type="email"],
-.register-form input[type="password"]{
+.register-form input[type="password"],
+.register-form input[type="date"]{
 
     height:56px;
     width:100%;
@@ -112,6 +113,8 @@
     font-size:1rem;
 
     box-sizing:border-box;
+
+    color-scheme:dark;
 }
 
 .register-form input:focus{
