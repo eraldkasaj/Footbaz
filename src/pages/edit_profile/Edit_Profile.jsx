@@ -11,6 +11,11 @@ import { useNavigate } from "react-router-dom";
 import { calculateAgeFromBirthdate } from "../../utils/age";
 import { LEAGUE_OPTIONS } from "../../data/leagues";
 
+// Vlerë speciale për "Klubi" kur lojtari s'e gjen klubin e vet real në listë
+// (ende s'është shtuar te Footbaz) — në atë rast lejohet emër i lirë + zgjedh
+// kampionatin manualisht, si më parë.
+const OTHER_CLUB = "__other__";
+
 
 // Countries most relevant for an Albanian-speaking scouting platform first,
 // followed by other common nationalities. If a player's saved nationality
@@ -51,8 +56,11 @@ const navigate = useNavigate();
 
 
 const [position,setPosition] = useState("");
-const [club,setClub] = useState("");
-const [league,setLeague] = useState("");
+const [clubs,setClubs] = useState([]);
+const [clubSelection,setClubSelection] = useState(""); // "" | OTHER_CLUB | club uid
+const [previousClubId,setPreviousClubId] = useState("");
+const [customClub,setCustomClub] = useState("");
+const [customLeague,setCustomLeague] = useState("");
 const [bio,setBio] = useState("");
 const [height,setHeight] = useState("");
 const [weight,setWeight] = useState("");
@@ -78,6 +86,19 @@ const getProfile = async()=>{
 const user = auth.currentUser;
 
 
+const clubsSnapshot = await get(ref(db,"clubs"));
+
+if(clubsSnapshot.exists()){
+
+const clubsData = clubsSnapshot.val();
+
+const clubsArray = Object.keys(clubsData).map((uid)=>({ uid, ...clubsData[uid] }));
+
+setClubs(clubsArray);
+
+}
+
+
 if(user){
 
 
@@ -96,9 +117,33 @@ const profileData = data.profile || {};
 
 setPosition(profileData.position || "");
 
-setClub(profileData.club || "");
+// Nëse profili ka tashmë një clubId (klub real i platformës), e
+// parazgjedhim atë te selecti. Përndryshe, nëse ka vetëm emër të lirë
+// (llogari më të vjetra), kalojmë te modaliteti "Klub tjetër" me
+// vlerat ekzistuese, që të mos humbasë asgjë.
+if(profileData.clubId){
 
-setLeague(profileData.league || "");
+setClubSelection(profileData.clubId);
+
+setPreviousClubId(profileData.clubId);
+
+}
+
+else if(profileData.club){
+
+setClubSelection(OTHER_CLUB);
+
+setCustomClub(profileData.club);
+
+setCustomLeague(profileData.league || "");
+
+}
+
+else if(profileData.league){
+
+setCustomLeague(profileData.league);
+
+}
 
 setBio(profileData.bio || "");
 
@@ -392,6 +437,17 @@ const user = auth.currentUser;
 const computedAge = calculateAgeFromBirthdate(birthdate);
 
 
+// Nga selecti i klubit nxjerrim emrin, kampionatin dhe clubId real —
+// kështu klubi dhe kampionati vijnë gjithmonë nga i njëjti rekord dhe
+// s'mund të bien ndesh (p.sh. klub i zgjedhur nën U-17 s'mund të ruhet
+// aksidentalisht si U-19).
+const isOtherClub = clubSelection === OTHER_CLUB;
+const selectedClub = !isOtherClub ? clubs.find((c)=>c.uid === clubSelection) : null;
+
+const club = isOtherClub ? customClub : (selectedClub?.profile?.name || "");
+const league = isOtherClub ? customLeague : (selectedClub?.profile?.league || "");
+const clubId = selectedClub ? selectedClub.uid : "";
+
 
 await update(
 
@@ -405,6 +461,8 @@ position,
 club,
 
 league,
+
+clubId,
 
 bio,
 
@@ -427,6 +485,43 @@ photoURL
 
 );
 
+
+// Sinkronizo rosterin e klubit — hiqe nga klubi i vjetër (nëse ndryshoi)
+// dhe shtoje te i riu. Këto shkrime kërkojnë një rregull sigurie shtesë
+// (lojtari lejohet të shtojë/heqë veten te clubs/{uid}/roster/{playerUid});
+// nëse rregulli ende s'është vendosur, i kapim gabimet veç e veç që
+// ruajtja e profilit të mos dështojë për këtë arsye.
+if(previousClubId && previousClubId !== clubId){
+
+try{
+
+await remove(ref(db,"clubs/" + previousClubId + "/roster/" + user.uid));
+
+}
+
+catch(rosterError){
+
+console.log("Roster removal failed:",rosterError.message);
+
+}
+
+}
+
+if(clubId && clubId !== previousClubId){
+
+try{
+
+await set(ref(db,"clubs/" + clubId + "/roster/" + user.uid),{ addedAt: Date.now() });
+
+}
+
+catch(rosterError){
+
+console.log("Roster add failed:",rosterError.message);
+
+}
+
+}
 
 
 console.log("Profili u perditesua");
@@ -719,7 +814,61 @@ onChange={(e)=>setPosition(e.target.value)}
 
 <div className="form-group">
 
-<label>Klubi aktual</label>
+<label>Klubi</label>
+
+
+<select
+
+value={clubSelection}
+
+onChange={(e)=>setClubSelection(e.target.value)}
+
+>
+
+<option value="">Zgjidh klubin</option>
+
+{LEAGUE_OPTIONS.filter((leagueOption)=>
+
+clubs.some((c)=>c.profile?.league === leagueOption)
+
+).map((leagueOption)=>(
+
+<optgroup key={leagueOption} label={leagueOption}>
+
+{clubs
+
+.filter((c)=>c.profile?.league === leagueOption)
+
+.map((c)=>(
+
+<option key={c.uid} value={c.uid}>
+
+{c.profile?.name || "Klub"}
+
+</option>
+
+))}
+
+</optgroup>
+
+))}
+
+<option value={OTHER_CLUB}>Klub tjetër (jo në listë)</option>
+
+</select>
+
+</div>
+
+
+
+
+{clubSelection === OTHER_CLUB && (
+
+<>
+
+<div className="form-group">
+
+<label>Emri i klubit</label>
 
 
 <input
@@ -728,15 +877,13 @@ type="text"
 
 placeholder="p.sh. Flamurtari FC"
 
-value={club}
+value={customClub}
 
-onChange={(e)=>setClub(e.target.value)}
+onChange={(e)=>setCustomClub(e.target.value)}
 
 />
 
 </div>
-
-
 
 
 <div className="form-group">
@@ -746,9 +893,9 @@ onChange={(e)=>setClub(e.target.value)}
 
 <select
 
-value={league}
+value={customLeague}
 
-onChange={(e)=>setLeague(e.target.value)}
+onChange={(e)=>setCustomLeague(e.target.value)}
 
 >
 
@@ -767,6 +914,10 @@ onChange={(e)=>setLeague(e.target.value)}
 </select>
 
 </div>
+
+</>
+
+)}
 
 
 
