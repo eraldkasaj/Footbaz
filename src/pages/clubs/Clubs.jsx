@@ -10,8 +10,13 @@ import { LEAGUE_OPTIONS } from "../../data/leagues";
 // Kampionatet e para 8 në LEAGUE_OPTIONS janë familja "Superliga" (Abissnet
 // Superiore, të gjitha moshat, + Superiore Vajza) — shfaqen në kolonën e
 // majtë. Pjesa tjetër (Kategoria e Parë e poshtë, me moshat e saj, etj.)
-// shkon në kolonën e djathtë.
-const SUPERLIGA_FAMILY = new Set(LEAGUE_OPTIONS.slice(0, 7));
+// shkon në kolonën e djathtë. "Klube Shqiptare Jashtë Vendit" shtohet
+// gjithashtu në kolonën e majtë — nuk është pjesë e piramidës Kategoria e
+// Parë/Dytë, kështu që nuk i përket kolonës së djathtë.
+const SUPERLIGA_FAMILY = new Set([
+  ...LEAGUE_OPTIONS.slice(0, 7),
+  "Klube Shqiptare Jashtë Vendit",
+]);
 
 function Clubs() {
   const [clubs, setClubs] = useState([]);

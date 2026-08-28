@@ -6,7 +6,6 @@ import {
   LuCalendarDays,
   LuListOrdered,
   LuPhone,
-  LuShield,
   LuUsers,
   LuGlobe,
   LuArrowUpDown,
@@ -18,6 +17,7 @@ import { getNationalityFlag } from "../../utils/nationality";
 import { getPositionName, comparePositions, getPositionGroup } from "../../utils/position";
 import { computeStandings } from "../../utils/standings";
 import defaultPlayerAvatar from "../../assets/images/avatar-player.png";
+import Club_Crest from "../club_crest/Club_Crest";
 
 // Nxjerr grupmoshën nga emri i ligës (p.sh. "U-17 Abissnet Superiore" -> "U17"),
 // që emri i klubit të dallojë ekipet e të njëjtit klub nëpër mosha të ndryshme
@@ -108,7 +108,7 @@ function Club_Profile_Card({ club, squadPlayers, squadStats, standing }) {
           {profile.photoURL ? (
             <img src={profile.photoURL} alt={profile.name} />
           ) : (
-            <LuShield />
+            <Club_Crest name={profile.name} seed={club.uid} />
           )}
         </div>
 

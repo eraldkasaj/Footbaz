@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { ref, push, set, update, remove } from "firebase/database";
 import { db } from "../../../firebase/firebase";
-import { LuPlus, LuX, LuShield, LuTrash2, LuTrophy } from "react-icons/lu";
+import { LuPlus, LuX, LuTrash2, LuTrophy } from "react-icons/lu";
+import Club_Crest from "../../../components/club_crest/Club_Crest";
 import { formatDateShort } from "../../../utils/time";
 
 function Matches({ clubUid, matches, setMatches, clubName, clubPhotoURL }) {
@@ -149,7 +150,7 @@ function Matches({ clubUid, matches, setMatches, clubName, clubPhotoURL }) {
               <div className="club-match-teams">
                 <div className="club-match-team">
                   <div className="club-match-team-mark">
-                    {homeTeam.logo ? <img src={homeTeam.logo} alt={homeTeam.name} style={{ width: "100%", height: "100%", borderRadius: 10, objectFit: "cover" }} /> : <LuShield />}
+                    {homeTeam.logo ? <img src={homeTeam.logo} alt={homeTeam.name} style={{ width: "100%", height: "100%", borderRadius: 10, objectFit: "cover" }} /> : <Club_Crest name={homeTeam.name} />}
                   </div>
                   <span>{homeTeam.name}</span>
                 </div>
@@ -164,7 +165,7 @@ function Matches({ clubUid, matches, setMatches, clubName, clubPhotoURL }) {
 
                 <div className="club-match-team">
                   <div className="club-match-team-mark">
-                    {awayTeam.logo ? <img src={awayTeam.logo} alt={awayTeam.name} style={{ width: "100%", height: "100%", borderRadius: 10, objectFit: "cover" }} /> : <LuShield />}
+                    {awayTeam.logo ? <img src={awayTeam.logo} alt={awayTeam.name} style={{ width: "100%", height: "100%", borderRadius: 10, objectFit: "cover" }} /> : <Club_Crest name={awayTeam.name} />}
                   </div>
                   <span>{awayTeam.name}</span>
                 </div>

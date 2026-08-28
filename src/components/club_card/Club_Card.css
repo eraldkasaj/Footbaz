@@ -39,6 +39,11 @@
   color: var(--text-secondary);
   font-size: 1.6rem;
   font-weight: 800;
+  /* Përmasë fikse — Club_Crest brenda përdor width/height:100%, kështu që
+     pa këtë do të zgjerohej pa kontroll brenda .club-logo-wrap fleks. */
+  display: flex;
+  width: 60%;
+  height: 60%;
 }
 
 .club-info {

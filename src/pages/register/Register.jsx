@@ -12,7 +12,7 @@ import { ref, set } from "firebase/database";
 
 import { LuArrowLeft } from "react-icons/lu";
 
-import { calculateAgeFromBirthdate } from "../../utils/age";
+import { calculateAgeFromBirthdate, getBirthdateError, getTodayDateString } from "../../utils/age";
 
 
 
@@ -62,6 +62,20 @@ function Register() {
       setError("Plotësoni të gjitha fushat.");
 
       return;
+
+    }
+
+    if (role === "player") {
+
+      const birthdateError = getBirthdateError(birthdate);
+
+      if (birthdateError) {
+
+        setError(birthdateError);
+
+        return;
+
+      }
 
     }
 
@@ -316,6 +330,7 @@ function Register() {
               type="date"
               placeholder="Datëlindja"
               value={birthdate}
+              max={getTodayDateString()}
               onChange={(e) => setBirthdate(e.target.value)}
             />
           )}
