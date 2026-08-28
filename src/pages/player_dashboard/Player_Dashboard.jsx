@@ -22,6 +22,7 @@ import {
 // Kept in a shared file so Edit Profile (current league) and this file's
 // career modal (historical league per club) use the exact same list.
 import { LEAGUE_OPTIONS } from "../../data/leagues";
+import Club_Crest from "../../components/club_crest/Club_Crest";
 
 const statItems = [
   ["matches", "Ndeshje"],
@@ -248,7 +249,7 @@ function Player_Dashboard() {
   // fusha të dedikuara), bie fallback te ai zë — kështu askush s'e humb
   // klubin që kishte vendosur më parë.
   const currentCareerEntry = careerEntries.find((entry) => !entry.endYear);
-  const club = profile.club || currentCareerEntry?.club || "Klubi nuk është vendosur";
+  const club = profile.club || currentCareerEntry?.club || "";
   const league = profile.league || currentCareerEntry?.league || "Superliga Shqiptare U-19";
 
   const videoEntries = userData?.videos
@@ -289,7 +290,13 @@ function Player_Dashboard() {
               <span className="talento-player-verified">Verified</span>
             </div>
 
-            <p className="talento-player-club"><LuShield /> {club}</p>
+            <p className="talento-player-club">
+              {club ? (
+                <><span className="talento-player-club-icon"><Club_Crest name={club} seed={profile.clubId} size={18} /></span> {club}</>
+              ) : (
+                <><LuShield /> Klubi nuk është vendosur</>
+              )}
+            </p>
             <p className="talento-player-league">🇦🇱 {league}</p>
 
             <div className="talento-player-facts">
@@ -370,10 +377,10 @@ function Player_Dashboard() {
             </section>
 
             <section className="talento-player-club-card">
-              <div className="talento-player-club-mark"><LuShield /></div>
+              <div className="talento-player-club-mark">{club ? <Club_Crest name={club} seed={profile.clubId} size={34} /> : <LuShield />}</div>
               <div>
                 <span>Klubi aktual</span>
-                <h2>{club}</h2>
+                <h2>{club || "Klubi nuk është vendosur"}</h2>
                 <p>🇦🇱 {league}</p>
               </div>
             </section>
@@ -446,7 +453,7 @@ function Player_Dashboard() {
             ) : (
               careerEntries.map((entry) => (
                 <div className="talento-player-career-entry" key={entry.id}>
-                  <div className="talento-player-club-mark"><LuShield /></div>
+                  <div className="talento-player-club-mark"><Club_Crest name={entry.club} seed={entry.clubId} size={34} /></div>
                   <div>
                     <span>{entry.endYear ? "Ish klub" : "Klubi aktual"}</span>
                     <h3>{entry.club}</h3>

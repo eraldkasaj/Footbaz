@@ -17,6 +17,7 @@ LuShield
 } from "react-icons/lu";
 
 import { formatBirthdate, getPlayerAge } from "../../utils/age";
+import Club_Crest from "../club_crest/Club_Crest";
 
 
 const statItems=[
@@ -208,7 +209,7 @@ const careerEntries=Object.entries(player.career || {})
 // (para se të kishte fusha të dedikuara), bie fallback te ai zë.
 const currentCareerEntry=careerEntries.find((entry)=>!entry.endYear);
 
-const club=profile.club || currentCareerEntry?.club || "Klubi nuk është vendosur";
+const club=profile.club || currentCareerEntry?.club || "";
 
 
 const league=profile.league || currentCareerEntry?.league || "Superliga Shqiptare U-19";
@@ -320,7 +321,11 @@ Verified
 
 <p className="talento-player-club">
 
-<LuShield/> {club}
+{club ? (
+<><span className="talento-player-club-icon"><Club_Crest name={club} seed={profile.clubId} size={18}/></span> {club}</>
+) : (
+<><LuShield/> Klubi nuk është vendosur</>
+)}
 
 </p>
 
@@ -544,13 +549,13 @@ statItems.map(([key,label])=>(
 
 <section className="talento-player-club-card">
 
-<div className="talento-player-club-mark"><LuShield/></div>
+<div className="talento-player-club-mark">{club ? <Club_Crest name={club} seed={profile.clubId} size={34}/> : <LuShield/>}</div>
 
 <div>
 
 <span>Klubi aktual</span>
 
-<h2>{club}</h2>
+<h2>{club || "Klubi nuk është vendosur"}</h2>
 
 <p>🇦🇱 {league}</p>
 
@@ -761,7 +766,7 @@ careerEntries.map((entry)=>(
 <div className="talento-player-career-entry" key={entry.id}>
 
 
-<div className="talento-player-club-mark"><LuShield/></div>
+<div className="talento-player-club-mark"><Club_Crest name={entry.club} seed={entry.clubId} size={34}/></div>
 
 
 <div>

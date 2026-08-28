@@ -8,6 +8,7 @@ import {
   LuTrophy,
 } from "react-icons/lu";
 import defaultAvatar from "../../assets/images/avatar-player.png";
+import Club_Crest from "../club_crest/Club_Crest";
 
 function PlayerCard({ player }) {
   const profile = player.profile || {};
@@ -16,7 +17,7 @@ function PlayerCard({ player }) {
   // mbarimi (para se të kishte fusha të dedikuara), bie fallback te ai zë.
   const careerEntries = Object.values(player.career || {});
   const currentCareerEntry = careerEntries.find((entry) => !entry.endYear) || careerEntries[careerEntries.length - 1];
-  const club = profile.club || currentCareerEntry?.club || "Klubi nuk është vendosur";
+  const club = profile.club || currentCareerEntry?.club || "";
   const league = profile.league || currentCareerEntry?.league || "Kampionati nuk është vendosur";
   const fullName = `${profile.name ?? ""} ${profile.surname ?? ""}`.trim() || "Lojtar";
   const age = profile.age ? `${profile.age} vjeç` : "Mosha —";
@@ -44,7 +45,13 @@ function PlayerCard({ player }) {
         </div>
 
         <div className="player-meta">
-          <span><LuShield /> {club}</span>
+          <span>
+            {club ? (
+              <><span className="player-club-icon"><Club_Crest name={club} seed={profile.clubId} size={14} /></span> {club}</>
+            ) : (
+              <><LuShield /> Klubi nuk është vendosur</>
+            )}
+          </span>
           <span><LuTrophy /> {league}</span>
           <span className="player-age-birthdate">
             <LuCalendarDays />

@@ -1,6 +1,7 @@
 import "./Club_Card.css";
 import { Link } from "react-router-dom";
-import { LuMapPin, LuChevronRight, LuShield } from "react-icons/lu";
+import { LuMapPin, LuChevronRight } from "react-icons/lu";
+import Club_Crest from "../club_crest/Club_Crest";
 
 function Club_Card({ club }) {
   const profile = club.profile || {};
@@ -14,7 +15,7 @@ function Club_Card({ club }) {
           <img src={profile.photoURL} className="club-logo-image" alt={profile.name} />
         ) : (
           <span className="club-logo-fallback">
-            <LuShield />
+            <Club_Crest name={profile.name} seed={club.uid} />
           </span>
         )}
       </div>

@@ -420,9 +420,16 @@
   display: grid;
   place-items: center;
   border-radius: 8px;
-  background: linear-gradient(135deg, #9f1d22, #351318);
-  color: #ff6b6b;
-  font-size: 1.3rem;
+}
+
+/* Kontejner me përmasë fikse për Club_Crest (SVG-ja e brendshme e tij përdor
+   width/height:100%, kështu që pa një kufizim eksplicit këtu do të
+   zgjerohej pa kontroll brenda rreshtit fleks të .talento-player-club). */
+.talento-player-club-icon {
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
 }
 
 .talento-player-club-card span,

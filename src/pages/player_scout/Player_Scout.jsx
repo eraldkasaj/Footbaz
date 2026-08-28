@@ -23,7 +23,7 @@ function Player_Scout() {
 
           <span className="player-scout-eyebrow">Zgjidh rrugën tënde</span>
 
-          <h1>Player & Club</h1>
+          <h1>Lojtarë & Klube</h1>
 
           <p>
 

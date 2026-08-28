@@ -8,7 +8,7 @@ import { ref,get,update,push,set,remove } from "firebase/database";
 
 import { useNavigate } from "react-router-dom";
 
-import { calculateAgeFromBirthdate } from "../../utils/age";
+import { calculateAgeFromBirthdate, getBirthdateError, getTodayDateString } from "../../utils/age";
 import { LEAGUE_OPTIONS } from "../../data/leagues";
 
 // Vlerë speciale për "Klubi" kur lojtari s'e gjen klubin e vet real në listë
@@ -433,6 +433,16 @@ try{
 
 
 const user = auth.currentUser;
+
+const birthdateError = getBirthdateError(birthdate);
+
+if (birthdateError) {
+
+window.alert(birthdateError);
+
+return;
+
+}
 
 const computedAge = calculateAgeFromBirthdate(birthdate);
 
@@ -1048,6 +1058,8 @@ value={calculateAgeFromBirthdate(birthdate) ?? (age || "—")}
 type="date"
 
 value={birthdate}
+
+max={getTodayDateString()}
 
 onChange={(e)=>{
 

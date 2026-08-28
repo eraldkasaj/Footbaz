@@ -1,5 +1,6 @@
-import { LuUsers, LuUserCog, LuSwords, LuCalendarClock, LuShield } from "react-icons/lu";
+import { LuUsers, LuUserCog, LuSwords, LuCalendarClock } from "react-icons/lu";
 import { timeAgo, formatDateFull } from "../../../utils/time";
+import Club_Crest from "../../../components/club_crest/Club_Crest";
 
 function isSameMonth(dateStr, reference) {
   if (!dateStr) return false;
@@ -100,7 +101,7 @@ function DashboardHome({ clubName, rosterCount, staffCount, trainings, matches, 
               <div className="club-upcoming-teams">
                 <div className="club-upcoming-team">
                   <div className="club-upcoming-team-mark">
-                    <LuShield />
+                    <Club_Crest name={clubName} />
                   </div>
                   <span>{clubName}</span>
                 </div>
@@ -109,7 +110,7 @@ function DashboardHome({ clubName, rosterCount, staffCount, trainings, matches, 
 
                 <div className="club-upcoming-team">
                   <div className="club-upcoming-team-mark">
-                    <LuShield />
+                    <Club_Crest name={upcomingMatch.opponent} />
                   </div>
                   <span>{upcomingMatch.opponent}</span>
                 </div>

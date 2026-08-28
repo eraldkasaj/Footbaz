@@ -59,7 +59,7 @@ function Navbar() {
 
           <Link to="/player-scout" onClick={closeMenu}>
 
-            Player & Club
+            Lojtarë & Klube
 
           </Link>
 
