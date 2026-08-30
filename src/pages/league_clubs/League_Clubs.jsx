@@ -31,7 +31,9 @@ function League_Clubs() {
   const [averageAge, setAverageAge] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
-  const [sortBy, setSortBy] = useState(null);
+  // Si parazgjedhje, klubet renditen sipas numrit të lojtarëve (më shumë së
+  // pari) — useri mund ta ndryshojë duke klikuar çdo kolonë tjetër.
+  const [sortBy, setSortBy] = useState("squad");
   const [sortDir, setSortDir] = useState("desc");
 
   const toggleSort = (column) => {
@@ -314,7 +316,7 @@ function League_Clubs() {
                     <th className="league-clubs-rank">#</th>
                     <th className="league-clubs-club">Klub</th>
                     <th className="league-clubs-numeric league-clubs-sortable" onClick={() => toggleSort("squad")}>
-                      Skuadra {renderSortIcon("squad")}
+                      Lojtarët {renderSortIcon("squad")}
                     </th>
                     <th className="league-clubs-numeric league-clubs-sortable" onClick={() => toggleSort("age")}>
                       Mosha mes. {renderSortIcon("age")}

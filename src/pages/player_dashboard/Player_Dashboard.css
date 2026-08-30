@@ -88,6 +88,74 @@
   color: #fda4af;
 }
 
+/* Animacion pulse/glow rreth "Edito profilin" kur profili është nën 80% i
+   plotë — zhduket automatikisht (klasa hiqet nga JSX) sapo të arrijë 80%+.
+   Ngjyra ndjek të njëjtin semafor si bar-i i progresit: e kuqe nën 40%,
+   portokalli 40–79%. */
+@keyframes talento-edit-profile-pulse-red {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.55); }
+  70% { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+@keyframes talento-edit-profile-pulse-orange {
+  0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.55); }
+  70% { box-shadow: 0 0 0 12px rgba(249, 115, 22, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
+}
+
+.talento-edit-profile-pulse-red {
+  animation: talento-edit-profile-pulse-red 2s ease-out infinite;
+  border-color: #ef4444 !important;
+  color: #ef4444 !important;
+}
+
+.talento-edit-profile-pulse-orange {
+  animation: talento-edit-profile-pulse-orange 2s ease-out infinite;
+  border-color: #f97316 !important;
+  color: #f97316 !important;
+}
+
+/* Nxitje për plotësim profili — vetëm në dashboard-in privat të lojtarit. */
+.talento-player-completion {
+  margin-top: 14px;
+  max-width: 280px;
+}
+
+.talento-player-completion-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.talento-player-completion-label span:last-child {
+  color: var(--brand-green);
+  font-weight: 700;
+}
+
+.talento-player-completion-bar {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.talento-player-completion-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--brand-green);
+  transition: width 0.4s ease;
+}
+
+.talento-player-completion-hint {
+  margin-top: 6px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
 .talento-player-hero {
   display: grid;
   grid-template-columns: 175px minmax(0, 1fr);
@@ -134,6 +202,16 @@
   color: #5eea92;
   font-size: 0.75rem;
   font-weight: 700;
+}
+
+/* Versioni "në hije" i "Verified" — shfaqet vetëm te dashboard-i privat kur
+   profili ende s'e ka arritur 80%, si nxitje. Hover jep hint-in (title). */
+.talento-player-verified--ghost {
+  background: rgba(148, 163, 184, 0.1);
+  border: 1px dashed rgba(148, 163, 184, 0.35);
+  color: var(--text-secondary);
+  opacity: 0.65;
+  cursor: help;
 }
 
 .talento-player-club,

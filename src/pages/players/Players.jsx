@@ -5,6 +5,19 @@ import "./Players.css";
 import { db } from "../../firebase/firebase";
 import { ref, get } from "firebase/database";
 import { LuSearch, LuX } from "react-icons/lu";
+import { isProfileVerified } from "../../utils/completeness";
+import { LEAGUE_OPTIONS } from "../../data/leagues";
+
+// Kampionati aktual i lojtarit vjen nga profili (dropdown-i i ri) ose, për
+// llogaritë e vjetra/rastet kur është shtuar te Karriera, nga zëri i fundit
+// pa datë mbarimi — e njëjta logjikë fallback si te Player_Card.jsx.
+function getPlayerLeague(player) {
+  const careerEntries = Object.values(player.career || {});
+  const currentCareerEntry =
+    careerEntries.find((entry) => !entry.endYear) || careerEntries[careerEntries.length - 1];
+
+  return player.profile?.league || currentCareerEntry?.league || "";
+}
 
 const positionOrder = [
   "GK",
@@ -20,6 +33,7 @@ function Players() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [position, setPosition] = useState("");
+  const [league, setLeague] = useState("");
   const [age, setAge] = useState("");
   const [sort, setSort] = useState("");
 
@@ -61,6 +75,15 @@ function Players() {
     return indexA - indexB;
   });
 
+  // Opsionet e ligës — vetëm kampionatet që kanë realisht lojtarë, në radhën
+  // kanonike të LEAGUE_OPTIONS; çdo vlerë tjetër (tekst i lirë, jo nga lista)
+  // shtohet në fund të renditur alfabetikisht, që të mos humbasë asnjë lojtar.
+  const presentLeagues = new Set(players.map(getPlayerLeague).filter(Boolean));
+  const leagueOptions = [
+    ...LEAGUE_OPTIONS.filter((option) => presentLeagues.has(option)),
+    ...[...presentLeagues].filter((value) => !LEAGUE_OPTIONS.includes(value)).sort(),
+  ];
+
   let filteredPlayers = [...players];
 
   filteredPlayers = filteredPlayers.filter((player) =>
@@ -77,6 +100,12 @@ function Players() {
     filteredPlayers = filteredPlayers.filter(
       (player) =>
         (player.profile?.position || "").toLowerCase() === position.toLowerCase()
+    );
+  }
+
+  if (league !== "") {
+    filteredPlayers = filteredPlayers.filter(
+      (player) => getPlayerLeague(player) === league
     );
   }
 
@@ -116,6 +145,17 @@ function Players() {
     );
   }
 
+  // Pa asnjë renditje të zgjedhur nga useri, lojtarët "Verified" dalin të
+  // parët si parazgjedhje — nxit profilet e plota dhe u jep atyre pamje më
+  // të mirë tek skautët. E njëjta renditje mund të zgjidhet edhe shprehimisht
+  // nga "Rendit sipas" (sort === "verified"), p.sh. për t'u kthyer tek kjo
+  // renditje pas zgjedhjes së një tjetre.
+  if (sort === "" || sort === "verified") {
+    filteredPlayers.sort(
+      (a, b) => Number(isProfileVerified(b)) - Number(isProfileVerified(a))
+    );
+  }
+
   if (sort === "age-asc") {
     filteredPlayers.sort(
       (a, b) => (Number(a.profile?.age) || 0) - (Number(b.profile?.age) || 0)
@@ -134,11 +174,13 @@ function Players() {
     );
   }
 
-  const hasActiveFilters = search !== "" || position !== "" || age !== "" || sort !== "";
+  const hasActiveFilters =
+    search !== "" || position !== "" || league !== "" || age !== "" || sort !== "";
 
   const resetFilters = () => {
     setSearch("");
     setPosition("");
+    setLeague("");
     setAge("");
     setSort("");
   };
@@ -149,7 +191,6 @@ function Players() {
 
       <section className="players-page">
         <div className="players-header">
-          <span className="players-eyebrow">Footbaz</span>
           <h1>Lojtarët</h1>
           <p>Zbulo talentet e platformës Footbaz.</p>
         </div>
@@ -190,6 +231,19 @@ function Players() {
             </select>
 
             <select
+              value={league}
+              onChange={(e) => setLeague(e.target.value)}
+            >
+              <option value="">Kampionati</option>
+
+              {leagueOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+
+            <select
               value={age}
               onChange={(e) => setAge(e.target.value)}
             >
@@ -207,6 +261,7 @@ function Players() {
               onChange={(e) => setSort(e.target.value)}
             >
               <option value="">Rendit sipas</option>
+              <option value="verified">Verified</option>
               <option value="age-asc">Mosha ↑</option>
               <option value="age-desc">Mosha ↓</option>
               <option value="newest">Më të rejat</option>

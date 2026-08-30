@@ -117,6 +117,28 @@
     color-scheme:dark;
 }
 
+/* Disa browser mobile (Safari/Chrome iOS & Android) e injorojnë "color" te
+   fushat native date/time dhe e shfaqin tekstin e datës të zi mbi sfondin e
+   errët — bëhet i padukshëm. Detyrohet me pseudo-elementet -webkit-datetime-edit
+   dhe -webkit-text-fill-color (të cilën disa WebView e respektojnë në vend të "color"). */
+.register-form input[type="date"]{
+    -webkit-text-fill-color:white;
+}
+
+.register-form input[type="date"]::-webkit-datetime-edit,
+.register-form input[type="date"]::-webkit-datetime-edit-fields-wrapper,
+.register-form input[type="date"]::-webkit-datetime-edit-text,
+.register-form input[type="date"]::-webkit-datetime-edit-month-field,
+.register-form input[type="date"]::-webkit-datetime-edit-day-field,
+.register-form input[type="date"]::-webkit-datetime-edit-year-field{
+    color:white;
+    -webkit-text-fill-color:white;
+}
+
+.register-form input[type="date"]::-webkit-calendar-picker-indicator{
+    filter:invert(1);
+}
+
 .register-form input:focus{
 
     outline:none;

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { db } from "../../firebase/firebase";
 import { ref, get } from "firebase/database";
 import heroPhone from "../../assets/images/hero-phone.png";
+import Video_E_Dites from "../video_e_dites/Video_E_Dites";
 
 function Hero() {
   const [stats, setStats] = useState({ players: 0, clubs: 0 });
@@ -39,6 +40,10 @@ function Hero() {
     <div className="hero-wrapper">
       <section className="hero">
         <div className="hero-glow" aria-hidden="true" />
+
+        <div className="hero-video-overlay">
+          <Video_E_Dites/>
+        </div>
 
         <div className="hero-left">
           <span className="hero-badge">
