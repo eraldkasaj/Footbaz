@@ -123,6 +123,15 @@
    dhe -webkit-text-fill-color (të cilën disa WebView e respektojnë në vend të "color"). */
 .register-form input[type="date"]{
     -webkit-text-fill-color:white;
+
+    /* Chrome/Android i jep fushës date/time "chrome" nativ (jo vetëm tekst),
+       që shpesh injoron border-color dhe shfaqet përherë me ngjyrën e temës
+       (blu/jeshile) — jo vetëm në :focus, si fushat e tjera. accent-color
+       neutral + outline:none e forcuar edhe jashtë :focus e eliminojnë këtë,
+       kështu që Datëlindja duket saktësisht si Emri/Mbiemri/Email jashtë
+       fokusit, dhe merr jeshilen vetëm kur është vërtet në fokus. */
+    outline:none;
+    accent-color:var(--border);
 }
 
 .register-form input[type="date"]::-webkit-datetime-edit,
@@ -137,6 +146,11 @@
 
 .register-form input[type="date"]::-webkit-calendar-picker-indicator{
     filter:invert(1);
+}
+
+.register-form input::placeholder{
+    color:var(--text-secondary);
+    opacity:1;
 }
 
 .register-form input:focus{
@@ -213,20 +227,6 @@
     text-decoration:none;
 
     font-weight:700;
-}
-
-.register-field{
-    display:flex;
-    flex-direction:column;
-    gap:6px;
-}
-
-.register-field-label{
-    color:var(--text-secondary);
-    font-size:0.85rem;
-    font-weight:600;
-
-    padding:0 2px;
 }
 
 .register-hint{

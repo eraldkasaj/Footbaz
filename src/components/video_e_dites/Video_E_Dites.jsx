@@ -6,17 +6,7 @@ import { db } from "../../firebase/firebase";
 import { ref, get } from "firebase/database";
 import defaultAvatar from "../../assets/images/avatar-player.png";
 import Club_Crest from "../club_crest/Club_Crest";
-
-// Zgjedh "video e ditës" në mënyrë deterministe nga dita e sotme — e njëjta
-// video shfaqet gjithë ditën për të gjithë vizitorët (jo random në çdo
-// ngarkim faqeje), dhe të nesërmen kalon te video-ja tjetër në listë, duke u
-// rrotulluar nëpër të gjitha videot e ngarkuara nga lojtarët.
-function pickVideoOfTheDay(videos) {
-  if (videos.length === 0) return null;
-
-  const dayIndex = Math.floor(Date.now() / 86400000);
-  return videos[dayIndex % videos.length];
-}
+import { pickOfTheDay } from "../../utils/pickOfTheDay";
 
 function Video_E_Dites() {
   const [video, setVideo] = useState(null);
@@ -56,7 +46,7 @@ function Video_E_Dites() {
             }));
         });
 
-        setVideo(pickVideoOfTheDay(allVideos));
+        setVideo(pickOfTheDay(allVideos));
       }
 
       setLoading(false);

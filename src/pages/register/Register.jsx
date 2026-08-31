@@ -360,16 +360,12 @@ function Register() {
           )}
 
           {role === "player" && (
-            <div className="register-field">
-              <label className="register-field-label" htmlFor="birthdate">Datëlindja</label>
-              <input
-                id="birthdate"
-                type="date"
-                value={birthdate}
-                max={getTodayDateString()}
-                onChange={(e) => setBirthdate(e.target.value)}
-              />
-            </div>
+            <input
+              type="date"
+              value={birthdate}
+              max={getTodayDateString()}
+              onChange={(e) => setBirthdate(e.target.value)}
+            />
           )}
 
           {role === "player" && isMinor && (
