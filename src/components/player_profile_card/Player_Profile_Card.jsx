@@ -17,6 +17,7 @@ LuShield
 } from "react-icons/lu";
 
 import { formatBirthdate, getPlayerAge } from "../../utils/age";
+import { isProfileVerified } from "../../utils/completeness";
 import Club_Crest from "../club_crest/Club_Crest";
 
 
@@ -189,6 +190,10 @@ const birthdate=profile.birthdate || profile.dateOfBirth;
 
 const age=getPlayerAge(profile);
 
+// "Verified" shfaqet vetëm kur profili është mjaftueshëm i plotë DHE ka foto
+// reale (njësoj si pragu te dashboard-i privat) — jo më statike/gjithmonë.
+const verified=isProfileVerified(player);
+
 const stats = player.statistics || {};
 
 
@@ -308,11 +313,13 @@ profile.photoURL ?
 <h1>{fullName}</h1>
 
 
+{verified && (
 <span className="talento-player-verified">
 
 Verified
 
 </span>
+)}
 
 
 </div>

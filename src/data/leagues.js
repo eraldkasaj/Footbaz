@@ -18,7 +18,7 @@ export const LEAGUE_OPTIONS = [
   "Kategoria e Dytë U-14",
   "Kategoria e Parë U-13",
   "Kategoria e Dytë U-13",
-  "Klube Shqiptare Jashtë Vendit",
+  "Klube Jashtë Shqipërisë",
 ];
 
 export default LEAGUE_OPTIONS;

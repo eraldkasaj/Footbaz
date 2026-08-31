@@ -4,36 +4,7 @@ import { Link } from "react-router-dom";
 import PlayerCard from "../player_card/Player_Card";
 import { db } from "../../firebase/firebase";
 import { ref, get } from "firebase/database";
-
-// Vlerëson sa i plotë është profili i lojtarit — foto ka peshë më të madhe
-function getCompletenessScore(player) {
-  const profile = player.profile || {};
-
-  const hasPhoto = Boolean(profile.photoURL);
-  const hasVideo = Boolean(player.videos && Object.keys(player.videos).length > 0);
-
-  const fields = [
-    profile.position,
-    profile.height,
-    profile.weight,
-    profile.nationality,
-    profile.birthdate,
-    profile.bio,
-    profile.age,
-    profile.dominantFoot,
-  ];
-
-  const filledCount = fields.filter(
-    (value) => value !== undefined && value !== null && value !== ""
-  ).length;
-
-  let score = filledCount;
-
-  if (hasPhoto) score += 5; // foto është faktori më i rëndësishëm vizual
-  if (hasVideo) score += 2;
-
-  return score;
-}
+import { getCompletenessScore } from "../../utils/completeness";
 
 function Lojtaret_Ne_Fokus() {
   const [players, setPlayers] = useState([]);

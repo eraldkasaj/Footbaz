@@ -85,11 +85,19 @@
 }
 
 .player-verified {
-  width: 17px;
-  height: 17px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   margin-left: auto;
   flex: 0 0 auto;
-  color: var(--brand-teal);
+  color: var(--brand-green);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.player-verified svg {
+  width: 15px;
+  height: 15px;
 }
 
 .player-meta {

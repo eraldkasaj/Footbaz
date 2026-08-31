@@ -9,9 +9,13 @@ import {
 } from "react-icons/lu";
 import defaultAvatar from "../../assets/images/avatar-player.png";
 import Club_Crest from "../club_crest/Club_Crest";
+import { isProfileVerified } from "../../utils/completeness";
 
 function PlayerCard({ player }) {
   const profile = player.profile || {};
+  // "Verified" shfaqet vetëm kur profili është mjaftueshëm i plotë (≥80%) DHE
+  // ka foto reale — njësoj si te dashboard-i privat dhe profili publik.
+  const verified = isProfileVerified(player);
   // Klubi aktual vjen nga profili (vendoset te Edito Profilin). Për llogaritë
   // e vjetra që e kishin vendosur klubin vetëm si zë karriere pa datë
   // mbarimi (para se të kishte fusha të dedikuara), bie fallback te ai zë.
@@ -41,7 +45,11 @@ function PlayerCard({ player }) {
       <div className="player-info">
         <div className="player-name-row">
           <h3>{fullName}</h3>
-          <LuBadgeCheck className="player-verified" aria-label="Profil i verifikuar" />
+          {verified && (
+            <span className="player-verified">
+              <LuBadgeCheck /> Verified
+            </span>
+          )}
         </div>
 
         <div className="player-meta">

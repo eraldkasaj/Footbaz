@@ -33,7 +33,7 @@ function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [role, setRole] = useState("player");
+  const [role, setRole] = useState(null);
   const [emailFocused, setEmailFocused] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -95,9 +95,9 @@ function Register() {
 
     }
 
-    if (role === "player" && isMinor && (!parentEmail || !parentConsent)) {
+    if (role === "player" && isMinor && !parentConsent) {
 
-      setError("Meqë je nën 18 vjeç, duhet email i prindit/kujdestarit dhe pëlqimi i tij për të vazhduar.");
+      setError("Meqë je nën 18 vjeç, duhet pëlqimi i prindit/kujdestarit për të vazhduar.");
 
       return;
 
@@ -303,8 +303,42 @@ function Register() {
           onSubmit={handleRegister}
         >
 
+          <p className="register-hint">Regjistrohu si:</p>
 
+          <div className="role-select">
 
+            <label>
+
+              <input
+                type="radio"
+                name="role"
+                value="player"
+                checked={role === "player"}
+                onChange={(e) => setRole(e.target.value)}
+              />
+
+              Lojtar
+
+            </label>
+
+            <label>
+
+              <input
+                type="radio"
+                name="role"
+                value="club"
+                checked={role === "club"}
+                onChange={(e) => setRole(e.target.value)}
+              />
+
+              Klub
+
+            </label>
+
+          </div>
+
+          {role && (
+          <>
 
           <input
             type="text"
@@ -326,26 +360,29 @@ function Register() {
           )}
 
           {role === "player" && (
-            <input
-              type="date"
-              placeholder="Datëlindja"
-              value={birthdate}
-              max={getTodayDateString()}
-              onChange={(e) => setBirthdate(e.target.value)}
-            />
+            <div className="register-field">
+              <label className="register-field-label" htmlFor="birthdate">Datëlindja</label>
+              <input
+                id="birthdate"
+                type="date"
+                value={birthdate}
+                max={getTodayDateString()}
+                onChange={(e) => setBirthdate(e.target.value)}
+              />
+            </div>
           )}
 
           {role === "player" && isMinor && (
             <>
               <input
                 type="email"
-                placeholder="Email i prindit/kujdestarit"
+                placeholder="Email i prindit/kujdestarit (opsionale)"
                 value={parentEmail}
                 onChange={(e) => setParentEmail(e.target.value)}
               />
 
               <p className="register-hint">
-                Meqë je nën 18 vjeç, na duhet email i prindit/kujdestarit tënd. Regjistrimi lejohet vetëm me pëlqimin e tij.
+                Meqë je nën 18 vjeç, regjistrimi lejohet vetëm me pëlqimin e prindit/kujdestarit tënd.
               </p>
 
               <label className="register-checkbox">
@@ -404,52 +441,6 @@ function Register() {
 
 
 
-          <div className="role-select">
-
-
-
-            <label>
-
-
-              <input
-                type="radio"
-                name="role"
-                value="player"
-                checked={role === "player"}
-                onChange={(e) => setRole(e.target.value)}
-              />
-
-
-              Lojtar
-
-
-            </label>
-
-
-
-
-
-            <label>
-
-
-              <input
-                type="radio"
-                name="role"
-                value="club"
-                checked={role === "club"}
-                onChange={(e) => setRole(e.target.value)}
-              />
-
-
-              Klub
-
-
-            </label>
-
-
-
-          </div>
-
           <label className="register-checkbox">
             <input
               type="checkbox"
@@ -468,8 +459,8 @@ function Register() {
 
           </button>
 
-
-
+          </>
+          )}
 
         </form>
 

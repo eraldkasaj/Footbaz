@@ -8,6 +8,7 @@ import {
   formatBirthdate,
   getPlayerAge,
 } from "../../utils/age";
+import { getProfileCompletionPercent, isProfileVerified } from "../../utils/completeness";
 import {
   LuFootprints,
   LuLogOut,
@@ -146,6 +147,14 @@ function Player_Dashboard() {
     getUser();
   }, [navigate]);
 
+  // Sapo hapet dashboard-i (p.sh. menjëherë pas login-it), shko në krye të
+  // faqes që lojtari ta shohë menjëherë butonin "Edito profilin" dhe nxitjen
+  // për plotësim profili, edhe nëse browser-i kishte ruajtur një pozicion
+  // tjetër scroll-i nga më parë.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const logout = async () => {
     await signOut(auth);
     navigate("/login");
@@ -236,6 +245,17 @@ function Player_Dashboard() {
   const fullName =[profile.name, profile.surname].filter(Boolean).join(" ") || "Profili im";
   const pitchPosition = getPitchPosition(profile.position);
 
+  // Nxitje për plotësim profili — vetëm në dashboard-in privat të lojtarit,
+  // jo te profili publik që e shohin skautët/klubet (Player_Profile_Card.jsx
+  // s'e përdor këtë fare).
+  const completionPercent = getProfileCompletionPercent(userData || {});
+
+  // Semafor: e kuqe kur profili është pak i plotësuar, portokalli në mes,
+  // jeshile kur është afër përfundimit (njësoj si pragu i animacionit pulse).
+  const completionColor =
+    completionPercent < 40 ? "#ef4444" : completionPercent < 80 ? "#f97316" : "#22c55e";
+  const verified = isProfileVerified(userData || {});
+
   const careerEntries = Object.entries(userData?.career || {})
     .map(([id, entry]) => ({ id, ...entry }))
     // parseInt (not Number) so a malformed value like "2025-2026" still sorts
@@ -267,8 +287,18 @@ function Player_Dashboard() {
           <button type="button" onClick={() => navigate("/player-settings")}>
             <LuSettings /> Cilësimet
           </button>
-          <button type="button" onClick={() => navigate("/edit-profile")}>
-            <LuPencil /> Edito profilin
+          <button
+            type="button"
+            className={
+              completionPercent < 40
+                ? "talento-edit-profile-pulse-red"
+                : completionPercent < 80
+                ? "talento-edit-profile-pulse-orange"
+                : ""
+            }
+            onClick={() => navigate("/edit-profile")}
+          >
+            <LuPencil /> {completionPercent < 80 ? "Plotëso profilin" : "Edito profilin"}
           </button>
           <button type="button" className="talento-player-logout" onClick={logout}>
             <LuLogOut /> Dil
@@ -287,7 +317,20 @@ function Player_Dashboard() {
           <div className="talento-player-summary">
             <div className="talento-player-name-row">
               <h1>{fullName}</h1>
-              <span className="talento-player-verified">Verified</span>
+              {verified ? (
+                <span className="talento-player-verified">Verified</span>
+              ) : (
+                <span
+                  className="talento-player-verified talento-player-verified--ghost"
+                  title={
+                    profile.photoURL
+                      ? "Plotëso profilin mbi 80% dhe bëhu Verified!"
+                      : "Shto një foto profili dhe plotëso profilin mbi 80% për t'u bërë Verified!"
+                  }
+                >
+                  Verified
+                </span>
+              )}
             </div>
 
             <p className="talento-player-club">
@@ -298,6 +341,24 @@ function Player_Dashboard() {
               )}
             </p>
             <p className="talento-player-league">🇦🇱 {league}</p>
+
+            <div className="talento-player-completion">
+              <div className="talento-player-completion-label">
+                <span>Profili</span>
+                <span style={{ color: completionColor }}>{completionPercent}% i plotë</span>
+              </div>
+              <div className="talento-player-completion-bar">
+                <div
+                  className="talento-player-completion-fill"
+                  style={{ width: `${completionPercent}%`, background: completionColor }}
+                />
+              </div>
+              {completionPercent < 100 && (
+                <p className="talento-player-completion-hint">
+                  Plotëso profilin për t'u dukur më shumë te skautët!
+                </p>
+              )}
+            </div>
 
             <div className="talento-player-facts">
               <div>
