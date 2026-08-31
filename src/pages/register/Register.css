@@ -215,6 +215,20 @@
     font-weight:700;
 }
 
+.register-field{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+}
+
+.register-field-label{
+    color:var(--text-secondary);
+    font-size:0.85rem;
+    font-weight:600;
+
+    padding:0 2px;
+}
+
 .register-hint{
     margin-top:-8px;
 

@@ -51,14 +51,19 @@
 
 .video-of-day-player{
     width:100%;
-    aspect-ratio:16/9;
+    line-height:0;
     background:#07101f;
 }
 
+/* Aspect-ratio vendoset direkt te <video>, jo si height:100% e trashëguar
+   nga wrapper-i — përndryshe nëse lartësia e wrapper-it (nga aspect-ratio)
+   nuk zgjidhet si "definite" në ndonjë kontekst (p.sh. brenda overlay-it
+   absolut mbi Hero), browser-i bie te lartësia default e <video> pa stil
+   (150px), duke e zgjatur karton shumë poshtë vetes. */
 .video-of-day-player video{
     display:block;
     width:100%;
-    height:100%;
+    aspect-ratio:16/9;
     object-fit:cover;
 }
 
