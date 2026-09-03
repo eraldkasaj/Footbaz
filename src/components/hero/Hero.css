@@ -208,22 +208,6 @@
   color: var(--brand-teal);
 }
 
-/* Video e Ditës — mbivendosur mbi Hero-n, e centruar mes kolonës së tekstit
-   (majtas) dhe mockup-it të telefonit (djathtas), sipër çdo gjëje tjetër. */
-
-.hero-video-overlay {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  z-index: 5;
-
-  width: min(420px, 70vw);
-
-  transform: translate(-50%, -50%);
-
-  filter: drop-shadow(0 18px 32px rgba(0, 0, 0, 0.5));
-}
-
 /* ===================== Right side / phone showcase ===================== */
 
 .hero-right {

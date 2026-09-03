@@ -95,7 +95,8 @@
 .register-form input[type="text"],
 .register-form input[type="email"],
 .register-form input[type="password"],
-.register-form input[type="date"]{
+.register-form input[type="date"],
+.register-form select{
 
     height:56px;
     width:100%;
@@ -115,6 +116,27 @@
     box-sizing:border-box;
 
     color-scheme:dark;
+}
+
+.register-form select{
+    cursor:pointer;
+}
+
+.register-club-claim{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+
+    padding:16px;
+    border-radius:14px;
+
+    background:#0b1325;
+    border:1px solid var(--border);
+}
+
+.register-club-claim .register-hint{
+    margin-top:0;
+    padding:0;
 }
 
 /* Disa browser mobile (Safari/Chrome iOS & Android) e injorojnë "color" te
