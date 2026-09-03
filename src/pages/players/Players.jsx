@@ -45,10 +45,17 @@ function Players() {
       if (snapshot.exists()) {
         const data = snapshot.val();
 
-        const playersArray = Object.keys(data).map((uid) => ({
-          uid,
-          ...data[uid],
-        }));
+        const playersArray = Object.keys(data)
+          .map((uid) => ({
+            uid,
+            ...data[uid],
+          }))
+          // Fsheh profilet e reja që s'kanë verifikuar ende email-in (shih
+          // Register.jsx/Login.jsx). "!== false" (jo "=== true") ruan
+          // prapa-përputhshmërinë me llogaritë e vjetra, të krijuara para
+          // kësaj fushe — ato s'e kanë fare emailVerified, ndaj mbeten të
+          // dukshme si më parë, s'zhduken papritmas nga direktoria publike.
+          .filter((player) => player.emailVerified !== false && !player.disabled);
 
         setPlayers(playersArray);
       }
