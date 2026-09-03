@@ -1,14 +1,15 @@
 import "./Register.css";
 import { Link, useNavigate } from "react-router-dom";
 import logo_img from "../../assets/images/logo.png";
+import Club_Claim_Form from "../../components/club_claim/Club_Claim_Form";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { auth, db } from "../../firebase/firebase";
 
 import { createUserWithEmailAndPassword, sendEmailVerification, deleteUser } from "firebase/auth";
 
-import { ref, set } from "firebase/database";
+import { ref, set, get } from "firebase/database";
 
 import { LuArrowLeft } from "react-icons/lu";
 
@@ -41,6 +42,68 @@ function Register() {
   // vendosur nëse duhet kërkuar email + pëlqim i prindit/kujdestarit.
   const playerAge = role === "player" ? calculateAgeFromBirthdate(birthdate) : null;
   const isMinor = playerAge !== null && playerAge < 18;
+
+  // Për rolin "club": lista e klubeve ekzistuese, e ngarkuar një herë kur
+  // zgjidhet ky rol. Useri zgjedh nga kjo listë (dropdown) në vend që të
+  // shkruajë emrin lirshëm — kështu shmanget krijimi i klubeve "binjake" që
+  // në rrënjë. "new" do të thotë "klubi im s'është në listë, dua të krijoj
+  // një të ri" — vetëm atëherë shfaqet fusha e emrit + regjistrimi normal.
+  const [existingClubs, setExistingClubs] = useState([]);
+  const [clubSelection, setClubSelection] = useState("");
+
+  useEffect(() => {
+    setClubSelection("");
+  }, [role]);
+
+  useEffect(() => {
+    if (role !== "club") return;
+
+    const loadClubs = async () => {
+      const snapshot = await get(ref(db, "clubs"));
+      if (!snapshot.exists()) return;
+
+      const data = snapshot.val();
+      setExistingClubs(
+        Object.keys(data).map((uid) => ({ uid, ...data[uid] }))
+      );
+    };
+
+    loadClubs();
+  }, [role]);
+
+  const normalizeClubName = (value) =>
+    value
+      .trim()
+      .toLowerCase()
+      .replace(/ë/g, "e")
+      .replace(/ç/g, "c");
+
+  const matchingClubs =
+    role === "club" && clubSelection === "new" && name.trim()
+      ? existingClubs.filter(
+          (club) => normalizeClubName(club.profile?.name || "") === normalizeClubName(name)
+        )
+      : [];
+
+  const selectedExistingClub =
+    role === "club" && clubSelection && clubSelection !== "new"
+      ? existingClubs.find((club) => club.uid === clubSelection)
+      : null;
+
+  // Disa klube kanë të njëjtin emër (p.sh. "Apolonia" te U-17 dhe te U-19),
+  // ndaj kërkesa e ruajtur te clubClaims duhet të tregojë edhe ligën, jo
+  // vetëm emrin — përndryshe Aldi s'ka si ta dallojë cilit klub i përket
+  // kërkesa kur i shqyrton (i njëjti format si te opsionet e select-it sipër).
+  const selectedExistingClubLabel = selectedExistingClub
+    ? `${selectedExistingClub.profile?.name || "Klub"}${
+        selectedExistingClub.profile?.league ? ` — ${selectedExistingClub.profile.league}` : ""
+      }`
+    : "";
+
+  // Fushat e llogarisë (email/password/submit) shfaqen vetëm kur useri po
+  // krijon vërtet një llogari të re — lojtar, ose klub "i ri" (jo klub
+  // ekzistues, ku në vend të kësaj del formulari i kërkesës për qasje).
+  const showAccountFields = role === "player" || (role === "club" && clubSelection === "new");
 
 
 
@@ -174,6 +237,10 @@ function Register() {
             contactPhone: "",
             photoURL: "",
           },
+          // Klubi i vet-regjistruar është menjëherë "i zotëruar" nga vetë
+          // krijuesi — ndryshe nga klubet e shtuara nga admini (pa ownerUid),
+          // te të cilat dikush duhet të "kërkojë qasje" (shih clubClaims).
+          ownerUid: user.uid,
           consent: {
             acceptedTerms: true,
             acceptedAt: new Date().toISOString(),
@@ -340,15 +407,78 @@ function Register() {
           {role && (
           <>
 
-          <input
-            type="text"
-            placeholder={role === "club" ? "Emri i klubit" : "Emri"}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
+          {role === "player" && (
+            <input
+              type="text"
+              placeholder="Emri"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          )}
 
+          {role === "club" && (
+            <>
+              <select
+                value={clubSelection}
+                onChange={(e) => setClubSelection(e.target.value)}
+              >
+                <option value="">Zgjidh klubin tënd</option>
 
+                {[...existingClubs]
+                  .sort((a, b) => (a.profile?.name || "").localeCompare(b.profile?.name || ""))
+                  .map((club) => (
+                    <option key={club.uid} value={club.uid}>
+                      {club.profile?.name || "Klub"}
+                      {club.profile?.league ? ` — ${club.profile.league}` : ""}
+                      {club.ownerUid ? " (i menaxhuar)" : ""}
+                    </option>
+                  ))}
 
+                <option value="new">+ Krijo klub të ri</option>
+              </select>
+
+              {selectedExistingClub && (
+                <div className="register-club-claim">
+                  <p className="register-hint">
+                    {selectedExistingClub.ownerUid
+                      ? "Ky klub tashmë menaxhohet nga dikush. Nëse mendon se ka gabim, na kontakto."
+                      : "Ky klub ende s'ka përfaqësues të caktuar. Dërgo një kërkesë qasjeje — do ta shqyrtojmë dhe do të kontaktohesh."}
+                  </p>
+
+                  <Club_Claim_Form
+                    clubId={selectedExistingClub.uid}
+                    clubName={selectedExistingClubLabel}
+                  />
+                </div>
+              )}
+
+              {clubSelection === "new" && (
+                <>
+                  <input
+                    type="text"
+                    placeholder="Emri i klubit"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+
+                  {matchingClubs.length > 0 && (
+                    <p className="register-hint">
+                      Ekziston tashmë {matchingClubs.length === 1 ? "një klub" : "klube"} me këtë emër:{" "}
+                      {matchingClubs.map((club, index) => (
+                        <span key={club.uid}>
+                          <Link to={`/clubs/${club.uid}`} target="_blank" rel="noopener noreferrer">
+                            {club.profile?.name}
+                          </Link>
+                          {index < matchingClubs.length - 1 ? ", " : ""}
+                        </span>
+                      ))}
+                      . Nëse je përfaqësues i njërit, zgjidhe nga lista sipër dhe kërko qasje, në vend që të krijosh një llogari të re.
+                    </p>
+                  )}
+                </>
+              )}
+            </>
+          )}
 
           {role === "player" && (
             <input
@@ -396,6 +526,7 @@ function Register() {
 
 
 
+          {showAccountFields && (
           <input
             type="email"
             placeholder="Email"
@@ -405,13 +536,15 @@ function Register() {
             onBlur={() => setEmailFocused(false)}
             autoComplete="email"
           />
+          )}
 
-          {emailFocused && (
+          {showAccountFields && emailFocused && (
             <p className="register-hint">
               Përdor një email real që e kontrollon shpesh — do të duhet ta verifikosh (linku i konfirmimit) para se të mund të hysh në llogari.
             </p>
           )}
 
+          {showAccountFields && (
           <input
             type="password"
             placeholder="Password"
@@ -419,17 +552,20 @@ function Register() {
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="current-password"
           />
+          )}
 
 
 
 
 
+          {showAccountFields && (
           <input
             type="password"
             placeholder="Konfirmo Password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
+          )}
 
 
 
@@ -437,6 +573,7 @@ function Register() {
 
 
 
+          {showAccountFields && (
           <label className="register-checkbox">
             <input
               type="checkbox"
@@ -448,12 +585,15 @@ function Register() {
             {" "}dhe{" "}
             <Link to="/privacy" target="_blank" rel="noopener noreferrer">Politikën e Privatësisë</Link>.
           </label>
+          )}
 
+          {showAccountFields && (
           <button type="submit" disabled={isSubmitting}>
 
             {isSubmitting ? "Duke u regjistruar..." : "Regjistrohu"}
 
           </button>
+          )}
 
           </>
           )}

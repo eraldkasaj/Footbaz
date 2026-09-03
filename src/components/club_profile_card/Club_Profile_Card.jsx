@@ -18,6 +18,7 @@ import { getPositionName, comparePositions, getPositionGroup } from "../../utils
 import { computeStandings } from "../../utils/standings";
 import defaultPlayerAvatar from "../../assets/images/avatar-player.png";
 import Club_Crest from "../club_crest/Club_Crest";
+import Club_Claim_Form from "../club_claim/Club_Claim_Form";
 
 // Nxjerr grupmoshën nga emri i ligës (p.sh. "U-17 Abissnet Superiore" -> "U17"),
 // që emri i klubit të dallojë ekipet e të njëjtit klub nëpër mosha të ndryshme
@@ -170,6 +171,13 @@ function Club_Profile_Card({ club, squadPlayers, squadStats, standing }) {
               </div>
             )}
           </div>
+
+          {/* Klube të shtuara nga admini (ende pa "ownerUid") mund të
+              "kërkohen" nga një përfaqësues real i klubit — klubet e
+              vet-regjistruara e kanë ownerUid të vendosur që në krijim. */}
+          {!club.ownerUid && (
+            <Club_Claim_Form clubId={club.uid} clubName={displayName} />
+          )}
         </div>
       </div>
 

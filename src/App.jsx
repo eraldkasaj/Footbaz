@@ -22,6 +22,7 @@ import Player_Settings from "./pages/player_settings/Player_Settings";
 import Forgot_Password from "./pages/forgot_password/Forgot_Password";
 import Terms from "./pages/legal/Terms";
 import Privacy from "./pages/legal/Privacy";
+import Admin from "./pages/admin/Admin";
 import {Routes ,Route} from 'react-router-dom'
 
 
@@ -52,6 +53,7 @@ function App() {
     <Route path="/forgot-password" element={<Forgot_Password/>} />
     <Route path="/terms" element={<Terms />} />
     <Route path="/privacy" element={<Privacy />} />
+    <Route path="/admin" element={<Admin />} />
 
    </Routes>
       

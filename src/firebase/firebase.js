@@ -3,7 +3,7 @@ import { getAuth } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 
 
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: "AIzaSyAIOS-HQoAOjAZWcJ22dqu45-WRajAZ-q4",
   authDomain: "footbaz.firebaseapp.com",
   databaseURL: "https://footbaz-default-rtdb.europe-west1.firebasedatabase.app",

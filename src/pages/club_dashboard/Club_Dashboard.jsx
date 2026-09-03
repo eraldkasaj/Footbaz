@@ -10,6 +10,8 @@ import { useNavigate } from "react-router-dom";
 
 import { signOut } from "firebase/auth";
 
+import { resolveMyClubId } from "../../utils/resolveClubId";
+
 import {
   LuLayoutDashboard,
   LuUsers,
@@ -53,8 +55,8 @@ function Club_Dashboard() {
 
   const [activeView, setActiveView] = useState("home");
   const [selectedPlayerId, setSelectedPlayerId] = useState(null);
-
-  const clubUid = auth.currentUser?.uid;
+  const [clubUid, setClubUid] = useState(null);
+  const [noClubFound, setNoClubFound] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -65,17 +67,31 @@ function Club_Dashboard() {
         return;
       }
 
+      // "Klubi im" mund të jetë klub i vetë-regjistruar (ID-ja e klubit =
+      // UID-ja ime) ose një klub ekzistues që m'u dha si pronar përmes
+      // "Kërko qasje" → ownerUid (ID krejt tjetër nga UID-ja ime) — shih
+      // resolveClubId.js.
+      const resolvedClubId = await resolveMyClubId(user.uid);
+
+      if (!resolvedClubId) {
+        setNoClubFound(true);
+        setLoading(false);
+        return;
+      }
+
+      setClubUid(resolvedClubId);
+
       // "clubs" është publik (profile/roster/matches), ndërsa staf, stërvitje
       // dhe dokumente jetojnë në nyje krejt të veçanta që janë private për
       // klubin — kështu nuk ka rrezik që të dhëna private të "ngjiten" publike
       // bashkë me pjesën publike të "clubs" (rregullat e Firebase shkojnë
       // vetëm poshtë, jo lart, prandaj s'mund t'i ndajmë brenda të njëjtit degë).
       const [clubSnap, playersSnap, staffSnap, trainingsSnap, documentsSnap] = await Promise.all([
-        get(ref(db, "clubs/" + user.uid)),
+        get(ref(db, "clubs/" + resolvedClubId)),
         get(ref(db, "players")),
-        get(ref(db, "clubStaff/" + user.uid)),
-        get(ref(db, "clubTrainings/" + user.uid)),
-        get(ref(db, "clubDocuments/" + user.uid)),
+        get(ref(db, "clubStaff/" + resolvedClubId)),
+        get(ref(db, "clubTrainings/" + resolvedClubId)),
+        get(ref(db, "clubDocuments/" + resolvedClubId)),
       ]);
 
       if (clubSnap.exists()) {
@@ -124,6 +140,16 @@ function Club_Dashboard() {
       <section className="club-dashboard">
         <p className="club-empty" style={{ padding: "64px", width: "100%" }}>
           Duke ngarkuar...
+        </p>
+      </section>
+    );
+  }
+
+  if (noClubFound) {
+    return (
+      <section className="club-dashboard">
+        <p className="club-empty" style={{ padding: "64px", width: "100%" }}>
+          Llogaria jote s'është lidhur ende me asnjë klub. Kontakto footbazinfo@gmail.com.
         </p>
       </section>
     );

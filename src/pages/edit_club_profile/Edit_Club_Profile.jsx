@@ -10,6 +10,8 @@ import { useNavigate } from "react-router-dom";
 
 import { LEAGUE_OPTIONS } from "../../data/leagues";
 
+import { resolveMyClubId } from "../../utils/resolveClubId";
+
 
 function Edit_Club_Profile(){
 
@@ -28,6 +30,8 @@ const [contactPhone,setContactPhone] = useState("");
 const [photoURL,setPhotoURL] = useState("");
 
 const [saving,setSaving] = useState(false);
+
+const [clubId,setClubId] = useState(null);
 
 
 
@@ -50,8 +54,17 @@ return;
 }
 
 
+const resolvedClubId = await resolveMyClubId(user.uid);
+
+if(!resolvedClubId){
+navigate("/club-dashboard");
+return;
+}
+
+setClubId(resolvedClubId);
+
 const snapshot = await get(
-ref(db,"clubs/" + user.uid)
+ref(db,"clubs/" + resolvedClubId)
 );
 
 
@@ -155,14 +168,12 @@ e.preventDefault();
 try{
 
 
-const user = auth.currentUser;
-
 setSaving(true);
 
 
 await update(
 
-ref(db,"clubs/" + user.uid + "/profile"),
+ref(db,"clubs/" + clubId + "/profile"),
 
 {
 

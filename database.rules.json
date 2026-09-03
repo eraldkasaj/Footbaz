@@ -1,0 +1,56 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+    "players": {
+      ".read": true,
+      "$uid": {
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+    "clubs": {
+      ".read": true,
+      ".indexOn": ["ownerUid"],
+      "$clubId": {
+        ".write": "auth != null && (auth.uid === $clubId || root.child('clubs').child($clubId).child('ownerUid').val() === auth.uid)",
+        "ownerUid": {
+          ".write": "auth != null && (auth.uid === $clubId || root.child('users').child(auth.uid).child('role').val() === 'admin')"
+        },
+        "roster": {
+          "$playerId": {
+            ".write": "auth != null && (auth.uid === $clubId || auth.uid === $playerId || root.child('clubs').child($clubId).child('ownerUid').val() === auth.uid)"
+          }
+        }
+      }
+    },
+    "clubStaff": {
+      "$clubId": {
+        ".read": "auth != null && (auth.uid === $clubId || root.child('clubs').child($clubId).child('ownerUid').val() === auth.uid)",
+        ".write": "auth != null && (auth.uid === $clubId || root.child('clubs').child($clubId).child('ownerUid').val() === auth.uid)"
+      }
+    },
+    "clubTrainings": {
+      "$clubId": {
+        ".read": "auth != null && (auth.uid === $clubId || root.child('clubs').child($clubId).child('ownerUid').val() === auth.uid)",
+        ".write": "auth != null && (auth.uid === $clubId || root.child('clubs').child($clubId).child('ownerUid').val() === auth.uid)"
+      }
+    },
+    "clubDocuments": {
+      "$clubId": {
+        ".read": "auth != null && (auth.uid === $clubId || root.child('clubs').child($clubId).child('ownerUid').val() === auth.uid)",
+        ".write": "auth != null && (auth.uid === $clubId || root.child('clubs').child($clubId).child('ownerUid').val() === auth.uid)"
+      }
+    },
+    "clubClaims": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      "$claimId": {
+        ".write": "(!data.exists() && newData.hasChildren(['clubId','name','email','phone','roleAtClub','status'])) || (auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin')",
+        ".validate": "newData.hasChildren(['clubId','name','email','phone','roleAtClub','status'])"
+      }
+    }
+  }
+}

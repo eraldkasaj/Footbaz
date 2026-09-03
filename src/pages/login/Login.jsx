@@ -76,6 +76,10 @@ function Login() {
 
           navigate("/club-dashboard");
 
+        } else if (userData.role === "admin") {
+
+          navigate("/admin");
+
         }
 
       }

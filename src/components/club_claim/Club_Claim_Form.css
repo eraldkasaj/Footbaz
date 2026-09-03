@@ -1,0 +1,204 @@
+.club-claim-trigger{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+
+    margin-top:10px;
+    padding:9px 16px;
+    border-radius:9px;
+
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text-secondary);
+    font-size:0.82rem;
+    font-weight:600;
+
+    cursor:pointer;
+    transition:border-color .2s ease, color .2s ease;
+}
+
+.club-claim-trigger:hover{
+    border-color:var(--brand-teal);
+    color:var(--brand-teal);
+}
+
+.club-claim-backdrop{
+    position:fixed;
+    inset:0;
+    z-index:1000;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:20px;
+    background:rgba(2, 6, 14, 0.72);
+}
+
+.club-claim-modal{
+    width:100%;
+    max-width:420px;
+    max-height:88vh;
+    overflow-y:auto;
+
+    background:var(--bg-secondary);
+    border:1px solid var(--border);
+    border-radius:18px;
+
+    padding:22px;
+    box-sizing:border-box;
+}
+
+.club-claim-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:16px;
+}
+
+.club-claim-header h3{
+    margin:0;
+    color:var(--text-primary);
+    font-size:1.05rem;
+}
+
+.club-claim-header button{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    width:30px;
+    height:30px;
+    border:none;
+    border-radius:50%;
+
+    background:transparent;
+    color:var(--text-secondary);
+    cursor:pointer;
+}
+
+.club-claim-header button:hover{
+    background:rgba(255, 255, 255, 0.06);
+    color:var(--text-primary);
+}
+
+.club-claim-form{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+}
+
+.club-claim-form label{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+
+    color:var(--text-secondary);
+    font-size:0.85rem;
+    font-weight:600;
+}
+
+.club-claim-form input,
+.club-claim-form select,
+.club-claim-form textarea{
+    border:1px solid var(--border);
+    border-radius:10px;
+
+    background:#0b1325;
+    color:white;
+
+    padding:10px 12px;
+    font-size:0.9rem;
+    font-family:inherit;
+
+    box-sizing:border-box;
+    resize:vertical;
+}
+
+.club-claim-form select{
+    cursor:pointer;
+    color-scheme:dark;
+}
+
+.club-claim-form input:focus,
+.club-claim-form select:focus,
+.club-claim-form textarea:focus{
+    outline:none;
+    border-color:var(--brand-teal);
+}
+
+.club-claim-name-row{
+    display:flex;
+    gap:14px;
+}
+
+.club-claim-name-row label{
+    flex:1;
+    min-width:0;
+}
+
+.club-claim-hint{
+    color:var(--text-secondary);
+    font-size:0.76rem;
+    font-weight:400;
+    line-height:1.4;
+}
+
+@media (max-width:420px){
+    .club-claim-name-row{
+        flex-direction:column;
+        gap:14px;
+    }
+}
+
+.club-claim-error{
+    margin:0;
+    color:#ef4444;
+    font-size:0.82rem;
+}
+
+.club-claim-success{
+    color:var(--text-secondary);
+    font-size:0.9rem;
+    line-height:1.5;
+}
+
+.club-claim-actions{
+    display:flex;
+    gap:10px;
+    margin-top:4px;
+}
+
+.club-claim-cancel,
+.club-claim-submit{
+    flex:1;
+    height:44px;
+
+    border-radius:10px;
+    border:none;
+
+    font-size:0.88rem;
+    font-weight:700;
+    cursor:pointer;
+
+    transition:background .2s ease;
+}
+
+.club-claim-cancel{
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text-secondary);
+}
+
+.club-claim-cancel:hover{
+    border-color:var(--text-secondary);
+}
+
+.club-claim-submit{
+    background:var(--brand-teal);
+    color:#04120c;
+}
+
+.club-claim-submit:hover{ background:var(--brand-green); }
+.club-claim-submit:disabled{ opacity:0.6; cursor:not-allowed; }
