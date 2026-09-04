@@ -66,8 +66,18 @@ function normalizeName(value) {
     .replace(/ç/g, "c");
 }
 
+// fshf.org (WordPress + WAF) kthen 403 për kërkesa pa headers "browser-like" —
+// verifikuar kur script-i xhirohej nga GitHub Actions (funksiononte lokalisht,
+// ku fetch-i i Node/browser-it dërgon gjithsesi headers të ngjashëm nga OS-i).
+const BROWSER_HEADERS = {
+  "User-Agent":
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+  Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+  "Accept-Language": "sq-AL,sq;q=0.9,en;q=0.8",
+};
+
 async function fetchCompetitionMeta(slug) {
-  const res = await fetch(`https://fshf.org/competition/${slug}/`);
+  const res = await fetch(`https://fshf.org/competition/${slug}/`, { headers: BROWSER_HEADERS });
   if (!res.ok) throw new Error(`HTTP ${res.status} te faqja e kampionatit`);
 
   const html = await res.text();
@@ -83,7 +93,7 @@ async function fetchCompetitionMeta(slug) {
 
 async function fetchMatches(type, competitionId, nonce) {
   const url = `https://fshf.org/wp-json/fshf-livescore/v1/${type}?competition=${competitionId}&utcOffset=2&_wpnonce=${nonce}`;
-  const res = await fetch(url);
+  const res = await fetch(url, { headers: { ...BROWSER_HEADERS, Accept: "application/json" } });
   if (!res.ok) throw new Error(`HTTP ${res.status} nga API (${type})`);
 
   const data = await res.json();
