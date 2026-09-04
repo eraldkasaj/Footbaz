@@ -5,7 +5,7 @@ import { LuPlus, LuX, LuTrash2, LuUserCog } from "react-icons/lu";
 
 function Staff({ clubUid, staff, setStaff }) {
   const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState({ name: "", role: "", photoURL: "" });
+  const [form, setForm] = useState({ name: "", role: "", age: "", phone: "", startDate: "", photoURL: "" });
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -13,7 +13,7 @@ function Staff({ clubUid, staff, setStaff }) {
   const staffList = Object.entries(staff || {}).map(([id, s]) => ({ id, ...s }));
 
   const openModal = () => {
-    setForm({ name: "", role: "", photoURL: "" });
+    setForm({ name: "", role: "", age: "", phone: "", startDate: "", photoURL: "" });
     setError("");
     setShowModal(true);
   };
@@ -59,6 +59,9 @@ function Staff({ clubUid, staff, setStaff }) {
       const entry = {
         name: form.name.trim(),
         role: form.role.trim(),
+        age: form.age.trim(),
+        phone: form.phone.trim(),
+        startDate: form.startDate,
         photoURL: form.photoURL,
         addedAt: Date.now(),
       };
@@ -117,6 +120,16 @@ function Staff({ clubUid, staff, setStaff }) {
 
               <h4>{s.name}</h4>
               <p>{s.role}</p>
+
+              {(s.age || s.phone) && (
+                <p className="club-staff-meta">
+                  {[s.age ? `${s.age} vjeç` : null, s.phone || null].filter(Boolean).join(" · ")}
+                </p>
+              )}
+
+              {s.startDate && (
+                <p className="club-staff-meta">Që nga {s.startDate}</p>
+              )}
             </div>
           ))}
         </div>
@@ -143,6 +156,37 @@ function Staff({ clubUid, staff, setStaff }) {
               <div className="club-form-group">
                 <label>Roli</label>
                 <input value={form.role} onChange={(e) => setForm((p) => ({ ...p, role: e.target.value }))} placeholder="p.sh. Trajner Kryesor" />
+              </div>
+
+              <div className="club-form-group">
+                <label>Mosha (opsionale)</label>
+                <input
+                  value={form.age}
+                  onChange={(e) => setForm((p) => ({ ...p, age: e.target.value.replace(/\D/g, "").slice(0, 2) }))}
+                  placeholder="p.sh. 45"
+                  inputMode="numeric"
+                />
+              </div>
+
+              <div className="club-form-group">
+                <label>Telefon (opsionale)</label>
+                <input
+                  type="tel"
+                  value={form.phone}
+                  onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
+                  placeholder="p.sh. 068xxxxxxx"
+                />
+              </div>
+
+              <div className="club-form-group">
+                <label>Pjesë e ekipit që nga (opsionale)</label>
+                <input
+                  value={form.startDate}
+                  onChange={(e) => setForm((p) => ({ ...p, startDate: e.target.value.replace(/\D/g, "").slice(0, 4) }))}
+                  placeholder="p.sh. 2024"
+                  inputMode="numeric"
+                  maxLength={4}
+                />
               </div>
 
               <div className="club-form-group">

@@ -1,7 +1,7 @@
 import "./Player_Dashboard.css";
 import { useEffect, useState } from "react";
 import { auth, db } from "../../firebase/firebase";
-import { ref, get, push, set, remove } from "firebase/database";
+import { ref, get, push, set, remove, update, query, orderByChild, equalTo } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import {
@@ -10,6 +10,7 @@ import {
 } from "../../utils/age";
 import { getProfileCompletionPercent, isProfileVerified } from "../../utils/completeness";
 import {
+  LuCheck,
   LuFootprints,
   LuLogOut,
   LuPencil,
@@ -128,6 +129,13 @@ function Player_Dashboard() {
   const [careerError, setCareerError] = useState("");
   const [savingCareer, setSavingCareer] = useState(false);
 
+  // Ftesa nga klube (initiatedBy: "club") dhe kërkesa që kam dërguar unë vetë
+  // duke zgjedhur klubin te Edito Profilin (initiatedBy: "player") — të dyja
+  // jetojnë te "rosterRequests" dhe pritin miratim para se të shfaqem te
+  // roster-i real i klubit.
+  const [rosterRequests, setRosterRequests] = useState({});
+  const [respondingRequestId, setRespondingRequestId] = useState(null);
+
   useEffect(() => {
     const getUser = async () => {
       const user = auth.currentUser;
@@ -137,10 +145,17 @@ function Player_Dashboard() {
         return;
       }
 
-     const snapshot = await get(ref(db, `players/${user.uid}`));
+     const [snapshot, rosterRequestsSnap] = await Promise.all([
+        get(ref(db, `players/${user.uid}`)),
+        get(query(ref(db, "rosterRequests"), orderByChild("playerId"), equalTo(user.uid))),
+      ]);
 
       if (snapshot.exists()) {
         setUserData(snapshot.val());
+      }
+
+      if (rosterRequestsSnap.exists()) {
+        setRosterRequests(rosterRequestsSnap.val());
       }
     };
 
@@ -238,6 +253,55 @@ function Player_Dashboard() {
     }
   };
 
+  const respondToInvite = async (request, accept) => {
+    const user = auth.currentUser;
+
+    if (!user || respondingRequestId) return;
+
+    setRespondingRequestId(request.id);
+
+    try {
+      if (accept) {
+        await update(ref(db), {
+          [`clubs/${request.clubId}/roster/${user.uid}`]: { addedAt: Date.now() },
+          [`rosterRequests/${request.id}`]: null,
+        });
+      } else {
+        await remove(ref(db, `rosterRequests/${request.id}`));
+      }
+
+      setRosterRequests((previous) => {
+        const next = { ...previous };
+        delete next[request.id];
+        return next;
+      });
+    } catch (error) {
+      console.log(error.message);
+    } finally {
+      setRespondingRequestId(null);
+    }
+  };
+
+  const cancelOutgoingRequest = async (request) => {
+    if (respondingRequestId) return;
+
+    setRespondingRequestId(request.id);
+
+    try {
+      await remove(ref(db, `rosterRequests/${request.id}`));
+
+      setRosterRequests((previous) => {
+        const next = { ...previous };
+        delete next[request.id];
+        return next;
+      });
+    } catch (error) {
+      console.log(error.message);
+    } finally {
+      setRespondingRequestId(null);
+    }
+  };
+
   const profile = userData?.profile ?? {};
   const birthdate = profile.birthdate || profile.dateOfBirth;
   const age = getPlayerAge(profile);
@@ -271,6 +335,10 @@ function Player_Dashboard() {
   const currentCareerEntry = careerEntries.find((entry) => !entry.endYear);
   const club = profile.club || currentCareerEntry?.club || "";
   const league = profile.league || currentCareerEntry?.league || "Superliga Shqiptare U-19";
+
+  const rosterRequestList = Object.entries(rosterRequests || {}).map(([id, r]) => ({ id, ...r }));
+  const incomingInvites = rosterRequestList.filter((r) => r.initiatedBy === "club");
+  const outgoingRequests = rosterRequestList.filter((r) => r.initiatedBy === "player");
 
   const videoEntries = userData?.videos
     ? Object.entries(userData.videos)
@@ -391,6 +459,72 @@ function Player_Dashboard() {
             </div>
           </div>
         </header>
+
+        {(incomingInvites.length > 0 || outgoingRequests.length > 0) && (
+          <section className="talento-player-invites">
+            {incomingInvites.length > 0 && (
+              <>
+                <h2>Ftesa nga klube</h2>
+                {incomingInvites.map((invite) => (
+                  <div className="talento-invite-row" key={invite.id}>
+                    <div className="talento-player-club-mark">
+                      <Club_Crest name={invite.clubName} seed={invite.clubId} size={34} />
+                    </div>
+                    <div>
+                      <span>Ftesë për t'u bashkuar</span>
+                      <h3>{invite.clubName || "Klub"}</h3>
+                    </div>
+                    <div className="talento-invite-actions">
+                      <button
+                        type="button"
+                        className="talento-career-form-submit"
+                        disabled={respondingRequestId === invite.id}
+                        onClick={() => respondToInvite(invite, true)}
+                      >
+                        <LuCheck /> Prano
+                      </button>
+                      <button
+                        type="button"
+                        className="talento-career-form-cancel"
+                        disabled={respondingRequestId === invite.id}
+                        onClick={() => respondToInvite(invite, false)}
+                      >
+                        Refuzo
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+
+            {outgoingRequests.length > 0 && (
+              <>
+                <h2>Kërkesat e mia në pritje</h2>
+                {outgoingRequests.map((request) => (
+                  <div className="talento-invite-row" key={request.id}>
+                    <div className="talento-player-club-mark">
+                      <Club_Crest name={request.clubName} seed={request.clubId} size={34} />
+                    </div>
+                    <div>
+                      <span>Në pritje të miratimit nga klubi</span>
+                      <h3>{request.clubName || "Klub"}</h3>
+                    </div>
+                    <div className="talento-invite-actions">
+                      <button
+                        type="button"
+                        className="talento-career-form-cancel"
+                        disabled={respondingRequestId === request.id}
+                        onClick={() => cancelOutgoingRequest(request)}
+                      >
+                        Anulo
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+          </section>
+        )}
 
         <nav className="talento-player-tabs" aria-label="Seksionet e profilit">
           {["Përmbledhje", "Statistikat", "Media", "Karriera"].map((tab) => (

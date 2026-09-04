@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { ref, set, remove } from "firebase/database";
+import { ref, set, remove, update } from "firebase/database";
 import { db } from "../../../firebase/firebase";
-import { LuPlus, LuX, LuSearch, LuTrash2, LuChevronRight } from "react-icons/lu";
+import { LuPlus, LuX, LuSearch, LuTrash2, LuChevronRight, LuCheck } from "react-icons/lu";
 
 function getInitials(profile) {
   const first = profile?.name?.[0] || "";
@@ -9,11 +9,17 @@ function getInitials(profile) {
   return (first + last).toUpperCase();
 }
 
-function Roster({ rosterPlayers, allPlayers, clubUid, roster, setRoster, onOpenPlayer }) {
+// Shtimi i një lojtari NUK e fut më direkt te roster-i — krijon një "ftesë"
+// (rosterRequests/{clubId}_{playerId}) që lojtari duhet ta pranojë vetë te
+// dashboard-i i tij. Njësoj, një lojtar mund të kërkojë vetë t'i bashkohet
+// klubit (initiatedBy: "player") — ato kërkesa shfaqen këtu për t'u
+// pranuar/refuzuar. Kjo shmang shtimin e një lojtari pa dijeninë e tij.
+function Roster({ rosterPlayers, allPlayers, clubUid, clubName, roster, setRoster, rosterRequests, setRosterRequests, onOpenPlayer }) {
   const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [modalSearch, setModalSearch] = useState("");
-  const [adding, setAdding] = useState(false);
+  const [inviting, setInviting] = useState(false);
+  const [respondingId, setRespondingId] = useState(null);
 
   const filteredRoster = rosterPlayers.filter((player) =>
     [player.profile?.name, player.profile?.surname]
@@ -23,8 +29,13 @@ function Roster({ rosterPlayers, allPlayers, clubUid, roster, setRoster, onOpenP
       .includes(search.toLowerCase())
   );
 
+  const requestList = Object.entries(rosterRequests || {}).map(([id, r]) => ({ id, ...r }));
+  const outgoingInvites = requestList.filter((r) => r.initiatedBy === "club");
+  const incomingJoinRequests = requestList.filter((r) => r.initiatedBy === "player");
+  const requestedPlayerIds = new Set(requestList.map((r) => r.playerId));
+
   const availablePlayers = Object.keys(allPlayers || {})
-    .filter((id) => !roster[id])
+    .filter((id) => !roster[id] && !requestedPlayerIds.has(id))
     .map((id) => ({ uid: id, ...allPlayers[id] }))
     .filter((player) =>
       [player.profile?.name, player.profile?.surname]
@@ -34,21 +45,74 @@ function Roster({ rosterPlayers, allPlayers, clubUid, roster, setRoster, onOpenP
         .includes(modalSearch.toLowerCase())
     );
 
-  const addToRoster = async (playerId) => {
-    if (!clubUid || adding) return;
+  const sendInvite = async (playerId) => {
+    if (!clubUid || inviting) return;
 
-    setAdding(true);
+    setInviting(true);
 
     try {
-      const entry = { addedAt: Date.now() };
-      await set(ref(db, `clubs/${clubUid}/roster/${playerId}`), entry);
-      setRoster((prev) => ({ ...prev, [playerId]: entry }));
+      const requestId = `${clubUid}_${playerId}`;
+      const entry = {
+        clubId: clubUid,
+        playerId,
+        initiatedBy: "club",
+        status: "pending",
+        clubName: clubName || "",
+        createdAt: Date.now(),
+      };
+
+      await set(ref(db, `rosterRequests/${requestId}`), entry);
+      setRosterRequests((prev) => ({ ...prev, [requestId]: entry }));
       setShowModal(false);
       setModalSearch("");
     } catch (error) {
       console.log(error.message);
     } finally {
-      setAdding(false);
+      setInviting(false);
+    }
+  };
+
+  const cancelInvite = async (requestId) => {
+    try {
+      await remove(ref(db, `rosterRequests/${requestId}`));
+      setRosterRequests((prev) => {
+        const next = { ...prev };
+        delete next[requestId];
+        return next;
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const respondToJoinRequest = async (request, accept) => {
+    if (respondingId) return;
+
+    setRespondingId(request.id);
+
+    try {
+      if (accept) {
+        const rosterEntry = { addedAt: Date.now() };
+
+        await update(ref(db), {
+          [`clubs/${clubUid}/roster/${request.playerId}`]: rosterEntry,
+          [`rosterRequests/${request.id}`]: null,
+        });
+
+        setRoster((prev) => ({ ...prev, [request.playerId]: rosterEntry }));
+      } else {
+        await remove(ref(db, `rosterRequests/${request.id}`));
+      }
+
+      setRosterRequests((prev) => {
+        const next = { ...prev };
+        delete next[request.id];
+        return next;
+      });
+    } catch (error) {
+      console.log(error.message);
+    } finally {
+      setRespondingId(null);
     }
   };
 
@@ -95,6 +159,82 @@ function Roster({ rosterPlayers, allPlayers, clubUid, roster, setRoster, onOpenP
           </button>
         </div>
       </div>
+
+      {incomingJoinRequests.length > 0 && (
+        <div className="club-panel" style={{ marginBottom: 20 }}>
+          <h3>Kërkesa për t'u Bashkuar</h3>
+
+          {incomingJoinRequests.map((request) => {
+            const player = allPlayers?.[request.playerId];
+            const profile = player?.profile;
+            const fullName = [profile?.name, profile?.surname].filter(Boolean).join(" ") || "Lojtar";
+
+            return (
+              <div className="club-request-row" key={request.id}>
+                <div className="player-photo">
+                  {profile?.photoURL ? <img src={profile.photoURL} alt={fullName} /> : <span>{getInitials(profile)}</span>}
+                </div>
+
+                <div className="club-request-info">
+                  <h4>{fullName}</h4>
+                  <p>{profile?.position || "Pozicioni nuk është vendosur"}</p>
+                </div>
+
+                <div className="club-request-actions">
+                  <button
+                    type="button"
+                    className="club-btn-primary"
+                    disabled={respondingId === request.id}
+                    onClick={() => respondToJoinRequest(request, true)}
+                  >
+                    <LuCheck /> Prano
+                  </button>
+                  <button
+                    type="button"
+                    className="club-icon-btn danger"
+                    disabled={respondingId === request.id}
+                    onClick={() => respondToJoinRequest(request, false)}
+                    title="Refuzo"
+                  >
+                    <LuX />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {outgoingInvites.length > 0 && (
+        <div className="club-panel" style={{ marginBottom: 20 }}>
+          <h3>Ftesa në Pritje</h3>
+
+          {outgoingInvites.map((invite) => {
+            const player = allPlayers?.[invite.playerId];
+            const profile = player?.profile;
+            const fullName = [profile?.name, profile?.surname].filter(Boolean).join(" ") || "Lojtar";
+
+            return (
+              <div className="club-request-row" key={invite.id}>
+                <div className="player-photo">
+                  {profile?.photoURL ? <img src={profile.photoURL} alt={fullName} /> : <span>{getInitials(profile)}</span>}
+                </div>
+
+                <div className="club-request-info">
+                  <h4>{fullName}</h4>
+                  <p>Ftesë e dërguar — në pritje të përgjigjes</p>
+                </div>
+
+                <div className="club-request-actions">
+                  <button type="button" className="club-icon-btn danger" onClick={() => cancelInvite(invite.id)} title="Anulo ftesën">
+                    <LuTrash2 />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       <div className="club-panel">
         {filteredRoster.length === 0 ? (
@@ -166,6 +306,10 @@ function Roster({ rosterPlayers, allPlayers, clubUid, roster, setRoster, onOpenP
               </button>
             </div>
 
+            <p className="club-modal-hint">
+              Lojtari duhet ta pranojë ftesën nga dashboard-i i tij para se të shfaqet te skuadra.
+            </p>
+
             <div className="club-modal-search">
               <LuSearch />
               <input
@@ -184,7 +328,7 @@ function Roster({ rosterPlayers, allPlayers, clubUid, roster, setRoster, onOpenP
                   <div
                     className="club-modal-player-row"
                     key={player.uid}
-                    onClick={() => addToRoster(player.uid)}
+                    onClick={() => sendInvite(player.uid)}
                   >
                     <div className="player-photo">
                       {player.profile?.photoURL ? (

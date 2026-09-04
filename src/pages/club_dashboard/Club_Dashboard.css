@@ -540,6 +540,37 @@
 
 .club-icon-btn.danger:hover{ color:#f87171; border-color:#f87171; }
 
+/* ---------------- Roster requests (ftesa / kërkesa) ---------------- */
+
+.club-request-row{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:12px 0;
+  border-bottom:1px solid var(--border);
+}
+
+.club-request-row:last-child{ border-bottom:none; }
+
+.club-request-info{
+  flex:1;
+  min-width:0;
+}
+
+.club-request-info h4{ margin:0 0 2px; font-size:14px; }
+.club-request-info p{ margin:0; color:var(--text-secondary); font-size:12px; }
+
+.club-request-actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-shrink:0;
+}
+
+.club-request-actions .club-btn-primary{
+  padding:8px 14px;
+}
+
 /* ---------------- Generic modal ---------------- */
 
 .club-modal-backdrop{
@@ -583,6 +614,12 @@
   cursor:pointer;
   font-size:18px;
   display:flex;
+}
+
+.club-modal-hint{
+  margin:-6px 0 16px;
+  font-size:12px;
+  color:var(--text-secondary);
 }
 
 .club-modal-search{
@@ -968,9 +1005,21 @@
   background:rgba(16,183,127,0.16);
   color:var(--brand-teal);
   font-weight:700;
+  cursor:pointer;
+}
+
+.club-calendar-day.has-training.is-selected{
+  background:var(--brand-teal);
+  color:var(--bg-primary);
 }
 
 .club-calendar-day.is-empty{ visibility:hidden; }
+
+.club-calendar-selected-day{
+  margin-top:14px;
+  padding-top:10px;
+  border-top:1px solid var(--border);
+}
 
 .club-training-row{
   display:flex;

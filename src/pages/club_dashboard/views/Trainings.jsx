@@ -4,25 +4,41 @@ import { db } from "../../../firebase/firebase";
 import { LuPlus, LuX, LuChevronLeft, LuChevronRight, LuTrash2 } from "react-icons/lu";
 import { MONTH_NAMES, WEEKDAY_LABELS, formatDateShort } from "../../../utils/time";
 
+// E RËNDËSISHME: përdor komponentët LOKALË të datës, jo .toISOString() (që
+// konverton në UTC). Shqipëria është UTC+1/+2, kështu që mesnata lokale e
+// një dite (p.sh. qeliza e kalendarit për "6 Shtator") bie te 22:00-23:00 UTC
+// e ditës PARA — .toISOString() do ta kthente gabimisht si "5 Shtator", duke
+// bërë që stërvitjet e shtuara për datën 5 të duken të vendosura te dita 6.
 function toDateKey(date) {
-  return date.toISOString().slice(0, 10);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 function Trainings({ clubUid, trainings, setTrainings }) {
   const [monthCursor, setMonthCursor] = useState(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
   const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState({ title: "", date: "", time: "", location: "" });
+  const [form, setForm] = useState({ title: "", date: toDateKey(new Date()), time: "", location: "" });
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [selectedDayKey, setSelectedDayKey] = useState(null);
 
   const trainingEntries = Object.entries(trainings || {}).map(([id, t]) => ({ id, ...t }));
 
-  const trainingDateKeys = new Set(
-    trainingEntries.map((t) => {
-      const d = new Date(t.date);
-      return Number.isNaN(d.getTime()) ? null : toDateKey(d);
-    }).filter(Boolean)
-  );
+  // Harta datë -> lista e stërvitjeve atë ditë (jo thjesht një Set/bool si më
+  // parë) — kështu kur klikohet një ditë e theksuar, mund t'i tregojmë vetë
+  // titullin/orën/vendin, jo vetëm ta dimë që "ka diçka".
+  const trainingsByDate = new Map();
+  trainingEntries.forEach((t) => {
+    const d = new Date(t.date);
+    if (Number.isNaN(d.getTime())) return;
+    const key = toDateKey(d);
+    if (!trainingsByDate.has(key)) trainingsByDate.set(key, []);
+    trainingsByDate.get(key).push(t);
+  });
+
+  const selectedDayTrainings = selectedDayKey ? trainingsByDate.get(selectedDayKey) || [] : [];
 
   const year = monthCursor.getFullYear();
   const month = monthCursor.getMonth();
@@ -40,7 +56,7 @@ function Trainings({ clubUid, trainings, setTrainings }) {
     .sort((a, b) => new Date(a.date) - new Date(b.date));
 
   const openModal = () => {
-    setForm({ title: "", date: "", time: "", location: "" });
+    setForm({ title: "", date: toDateKey(new Date()), time: "", location: "" });
     setError("");
     setShowModal(true);
   };
@@ -106,13 +122,25 @@ function Trainings({ clubUid, trainings, setTrainings }) {
 
       <div className="club-panel" style={{ marginBottom: 20 }}>
         <div className="club-calendar-nav">
-          <button type="button" onClick={() => setMonthCursor(new Date(year, month - 1, 1))}>
+          <button
+            type="button"
+            onClick={() => {
+              setMonthCursor(new Date(year, month - 1, 1));
+              setSelectedDayKey(null);
+            }}
+          >
             <LuChevronLeft />
           </button>
           <span>
             {MONTH_NAMES[month]} {year}
           </span>
-          <button type="button" onClick={() => setMonthCursor(new Date(year, month + 1, 1))}>
+          <button
+            type="button"
+            onClick={() => {
+              setMonthCursor(new Date(year, month + 1, 1));
+              setSelectedDayKey(null);
+            }}
+          >
             <LuChevronRight />
           </button>
         </div>
@@ -128,15 +156,43 @@ function Trainings({ clubUid, trainings, setTrainings }) {
             if (!day) return <div className="club-calendar-day is-empty" key={`empty-${index}`} />;
 
             const dateKey = toDateKey(new Date(year, month, day));
-            const hasTraining = trainingDateKeys.has(dateKey);
+            const hasTraining = trainingsByDate.has(dateKey);
 
             return (
-              <div className={`club-calendar-day ${hasTraining ? "has-training" : ""}`} key={dateKey}>
+              <div
+                className={`club-calendar-day ${hasTraining ? "has-training" : ""} ${
+                  selectedDayKey === dateKey ? "is-selected" : ""
+                }`}
+                key={dateKey}
+                onClick={() => hasTraining && setSelectedDayKey((prev) => (prev === dateKey ? null : dateKey))}
+              >
                 {day}
               </div>
             );
           })}
         </div>
+
+        {selectedDayTrainings.length > 0 && (
+          <div className="club-calendar-selected-day">
+            {selectedDayTrainings.map((t) => (
+              <div className="club-training-row" key={t.id}>
+                <span className="club-training-date">{formatDateShort(t.date)}</span>
+
+                <div className="club-training-info" style={{ flex: 1 }}>
+                  <h4>{t.title}</h4>
+                  <p>
+                    {t.time ? `${t.time} · ` : ""}
+                    {t.location || "Vendi nuk është vendosur"}
+                  </p>
+                </div>
+
+                <button type="button" className="club-icon-btn danger" onClick={() => deleteTraining(t.id)}>
+                  <LuTrash2 />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="club-panel">

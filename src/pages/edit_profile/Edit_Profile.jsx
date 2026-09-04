@@ -496,11 +496,16 @@ photoURL
 );
 
 
-// Sinkronizo rosterin e klubit — hiqe nga klubi i vjetër (nëse ndryshoi)
-// dhe shtoje te i riu. Këto shkrime kërkojnë një rregull sigurie shtesë
-// (lojtari lejohet të shtojë/heqë veten te clubs/{uid}/roster/{playerUid});
-// nëse rregulli ende s'është vendosur, i kapim gabimet veç e veç që
-// ruajtja e profilit të mos dështojë për këtë arsye.
+// Sinkronizo rosterin e klubit — hiqe nga klubi i vjetër (nëse ndryshoi),
+// bashkë me çdo kërkesë të pazgjidhur atje, dhe trajtoje klubin e ri sipas
+// gjendjes së tij: nëse është "i pamenaxhuar" (askush s'e ka bërë "Kërko
+// qasje" ende — pa ownerUid), lojtari bashkohet direkt si më parë; nëse
+// klubi është i menaxhuar, në vend të shtimit direkt krijohet një kërkesë
+// te "rosterRequests" që klubi duhet ta pranojë vetë nga dashboard-i i tij
+// (Roster.jsx) — kështu askush s'shfaqet te një skuadër pa dijeninë e saj.
+// Këto shkrime kërkojnë rregulla sigurie shtesë; nëse ndonjë rregull ende
+// s'është vendosur, i kapim gabimet veç e veç që ruajtja e profilit të mos
+// dështojë për këtë arsye.
 if(previousClubId && previousClubId !== clubId){
 
 try{
@@ -515,9 +520,23 @@ console.log("Roster removal failed:",rosterError.message);
 
 }
 
+try{
+
+await remove(ref(db,"rosterRequests/" + previousClubId + "_" + user.uid));
+
+}
+
+catch(requestError){
+
+console.log("Stale roster request removal failed:",requestError.message);
+
+}
+
 }
 
 if(clubId && clubId !== previousClubId){
+
+if(!selectedClub?.ownerUid){
 
 try{
 
@@ -528,6 +547,38 @@ await set(ref(db,"clubs/" + clubId + "/roster/" + user.uid),{ addedAt: Date.now(
 catch(rosterError){
 
 console.log("Roster add failed:",rosterError.message);
+
+}
+
+}
+
+else{
+
+try{
+
+await set(ref(db,"rosterRequests/" + clubId + "_" + user.uid),{
+
+clubId,
+
+playerId: user.uid,
+
+initiatedBy: "player",
+
+status: "pending",
+
+clubName: club,
+
+createdAt: Date.now(),
+
+});
+
+}
+
+catch(requestError){
+
+console.log("Roster request failed:",requestError.message);
+
+}
 
 }
 

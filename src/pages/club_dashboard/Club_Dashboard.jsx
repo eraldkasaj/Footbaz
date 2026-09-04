@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import { auth, db } from "../../firebase/firebase";
 
-import { ref, get } from "firebase/database";
+import { ref, get, query, orderByChild, equalTo } from "firebase/database";
 
 import { useNavigate } from "react-router-dom";
 
@@ -52,6 +52,7 @@ function Club_Dashboard() {
   const [trainings, setTrainings] = useState({});
   const [matches, setMatches] = useState({});
   const [documents, setDocuments] = useState({});
+  const [rosterRequests, setRosterRequests] = useState({});
   const [loading, setLoading] = useState(true);
 
   const [activeView, setActiveView] = useState("home");
@@ -87,12 +88,13 @@ function Club_Dashboard() {
       // klubin — kështu nuk ka rrezik që të dhëna private të "ngjiten" publike
       // bashkë me pjesën publike të "clubs" (rregullat e Firebase shkojnë
       // vetëm poshtë, jo lart, prandaj s'mund t'i ndajmë brenda të njëjtit degë).
-      const [clubSnap, playersSnap, staffSnap, trainingsSnap, documentsSnap] = await Promise.all([
+      const [clubSnap, playersSnap, staffSnap, trainingsSnap, documentsSnap, rosterRequestsSnap] = await Promise.all([
         get(ref(db, "clubs/" + resolvedClubId)),
         get(ref(db, "players")),
         get(ref(db, "clubStaff/" + resolvedClubId)),
         get(ref(db, "clubTrainings/" + resolvedClubId)),
         get(ref(db, "clubDocuments/" + resolvedClubId)),
+        get(query(ref(db, "rosterRequests"), orderByChild("clubId"), equalTo(resolvedClubId))),
       ]);
 
       if (clubSnap.exists()) {
@@ -109,6 +111,7 @@ function Club_Dashboard() {
       if (staffSnap.exists()) setStaff(staffSnap.val());
       if (trainingsSnap.exists()) setTrainings(trainingsSnap.val());
       if (documentsSnap.exists()) setDocuments(documentsSnap.val());
+      if (rosterRequestsSnap.exists()) setRosterRequests(rosterRequestsSnap.val());
 
       setLoading(false);
     };
@@ -247,8 +250,11 @@ function Club_Dashboard() {
             rosterPlayers={rosterPlayers}
             allPlayers={players}
             clubUid={clubUid}
+            clubName={clubName}
             roster={roster}
             setRoster={setRoster}
+            rosterRequests={rosterRequests}
+            setRosterRequests={setRosterRequests}
             onOpenPlayer={openPlayer}
           />
         )}

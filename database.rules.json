@@ -57,6 +57,14 @@
         ".write": "(!data.exists() && newData.hasChildren(['clubId','name','email','phone','roleAtClub','status'])) || (auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin')",
         ".validate": "newData.hasChildren(['clubId','name','email','phone','roleAtClub','status'])"
       }
+    },
+    "rosterRequests": {
+      ".read": "auth != null",
+      ".indexOn": ["clubId", "playerId"],
+      "$requestId": {
+        ".write": "auth != null && ((newData.exists() ? newData : data).child('playerId').val() === auth.uid || (newData.exists() ? newData : data).child('clubId').val() === auth.uid || root.child('clubs').child((newData.exists() ? newData : data).child('clubId').val()).child('ownerUid').val() === auth.uid)",
+        ".validate": "!newData.exists() || (newData.hasChildren(['clubId','playerId','initiatedBy','status']) && newData.child('clubId').val() + '_' + newData.child('playerId').val() === $requestId && (newData.child('initiatedBy').val() === 'club' || newData.child('initiatedBy').val() === 'player') && newData.child('status').val() === 'pending')"
+      }
     }
   }
 }
