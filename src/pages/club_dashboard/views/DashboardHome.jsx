@@ -22,6 +22,10 @@ function DashboardHome({ clubName, rosterCount, staffCount, trainings, matches, 
     .filter((m) => m.status !== "played")
     .sort((a, b) => new Date(a.date) - new Date(b.date))[0];
 
+  const lastMatch = matchList
+    .filter((m) => m.status === "played")
+    .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+
   const activity = [
     ...Object.entries(roster || {}).map(([id, entry]) => {
       const p = players?.[id]?.profile;
@@ -94,7 +98,39 @@ function DashboardHome({ clubName, rosterCount, staffCount, trainings, matches, 
 
       <div className="club-home-grid">
         <div className="club-panel">
-          <h3>Ndeshja e Radhës</h3>
+          <h3>Ndeshja e Kaluar</h3>
+
+          {lastMatch ? (
+            <div className="club-upcoming-match">
+              <div className="club-upcoming-teams">
+                <div className="club-upcoming-team">
+                  <div className="club-upcoming-team-mark">
+                    <Club_Crest name={clubName} />
+                  </div>
+                  <span>{clubName}</span>
+                </div>
+
+                <span className="club-upcoming-vs">
+                  {lastMatch.isHome
+                    ? `${lastMatch.ourScore} - ${lastMatch.opponentScore}`
+                    : `${lastMatch.opponentScore} - ${lastMatch.ourScore}`}
+                </span>
+
+                <div className="club-upcoming-team">
+                  <div className="club-upcoming-team-mark">
+                    <Club_Crest name={lastMatch.opponent} />
+                  </div>
+                  <span>{lastMatch.opponent}</span>
+                </div>
+              </div>
+
+              <p className="club-upcoming-meta">{formatDateFull(lastMatch.date)}</p>
+            </div>
+          ) : (
+            <p className="club-upcoming-empty">Ende s'ka ndeshje të luajtura të sinkronizuara.</p>
+          )}
+
+          <h3 style={{ marginTop: 24 }}>Ndeshja e Radhës</h3>
 
           {upcomingMatch ? (
             <div className="club-upcoming-match">
@@ -123,7 +159,7 @@ function DashboardHome({ clubName, rosterCount, staffCount, trainings, matches, 
               </p>
             </div>
           ) : (
-            <p className="club-upcoming-empty">Nuk ka ndeshje të planifikuara.</p>
+            <p className="club-upcoming-empty">Nuk ka ndeshje të planifikuara ende nga FSHF.</p>
           )}
         </div>
 

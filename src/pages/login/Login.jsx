@@ -4,7 +4,7 @@ import logo_img from "../../assets/images/logo.png";
 import { useState } from "react";
 import { auth, db } from "../../firebase/firebase";
 import { signInWithEmailAndPassword, sendEmailVerification, signOut } from "firebase/auth";
-import { ref, get } from "firebase/database";
+import { ref, get, update } from "firebase/database";
 import { LuArrowLeft } from "react-icons/lu";
 
 function Login() {
@@ -69,6 +69,16 @@ function Login() {
 
 
         if (userData.role === "player") {
+
+          // Herën e parë që futet pas verifikimit të email-it, e shënojmë
+          // profilin si "emailVerified: true" — Players.jsx (kërkimi publik)
+          // e shfaq profilin vetëm pas kësaj, jo që në momentin e regjistrimit.
+          try {
+            await update(ref(db, "players/" + user.uid), { emailVerified: true });
+          } catch {
+            // Best-effort — nëse dështon, thjesht mbetet i fshehur deri herën
+            // tjetër që futet me sukses.
+          }
 
           navigate("/player-dashboard");
 

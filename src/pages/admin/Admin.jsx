@@ -1,11 +1,20 @@
 import "./Admin.css";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { auth, db } from "../../firebase/firebase";
 import { ref, get, update } from "firebase/database";
-import { LuArrowLeft, LuCheck, LuX } from "react-icons/lu";
+import {
+  LuArrowLeft,
+  LuCheck,
+  LuX,
+  LuLayoutDashboard,
+  LuInbox,
+  LuUsersRound,
+  LuTriangleAlert,
+} from "react-icons/lu";
 import { sendClaimStatusUpdate } from "../../utils/emailjsClaims";
 import { createManagedClubAccount, generateTempPassword } from "../../utils/manageClubAccount";
+import { normalizeName } from "../../utils/normalizeName";
 
 const STATUS_LABELS = {
   pending: "Në pritje",
@@ -13,23 +22,49 @@ const STATUS_LABELS = {
   rejected: "Refuzuar",
 };
 
-// Paneli i administratorit — për momentin vetëm shqyrtimi i kërkesave për
-// klube (clubClaims). Qasja lejohet vetëm te llogaria me users/{uid}/role
-// === "admin" (kontrollohet edhe nga rregullat e Firebase, jo vetëm këtu).
-// Aprovimi krijon vetë një llogari Footbaz për kërkuesin (email + fjalëkalim
-// i përkohshëm, pa prekur sesionin e Aldit — shih manageClubAccount.js),
-// e lidh si ownerUid te klubi, dhe ia dërgon kredencialet me email. Rregulli
-// i Firebase lejon "admin" të shkruajë VETËM fushën ownerUid të klubeve,
-// asgjë tjetër.
+const SECTIONS = [
+  { key: "overview", label: "Përmbledhje", icon: <LuLayoutDashboard /> },
+  { key: "claims", label: "Kërkesat për Klube", icon: <LuInbox /> },
+  { key: "manage", label: "Lojtarë & Klube", icon: <LuUsersRound /> },
+];
+
+const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+function isWithinLastWeek(createdAt) {
+  if (!createdAt) return false;
+  const timestamp = new Date(createdAt).getTime();
+  return !Number.isNaN(timestamp) && Date.now() - timestamp <= ONE_WEEK_MS;
+}
+
+// Paneli i administratorit. Qasja lejohet vetëm te llogaria me
+// users/{uid}/role === "admin" (kontrollohet edhe nga rregullat e Firebase,
+// jo vetëm këtu). Tre seksione:
+// - Përmbledhje: statistika të shpejta.
+// - Kërkesat për Klube: shqyrtimi i clubClaims — Aprovimi krijon vetë një
+//   llogari Footbaz për kërkuesin (pa prekur sesionin e Aldit, shih
+//   manageClubAccount.js), e lidh si ownerUid te klubi, dhe ia dërgon
+//   kredencialet me email.
+// - Lojtarë & Klube: kërkim + çaktivizim/aktivizim (fusha "disabled",
+//   admin-writable, s'prek asgjë tjetër nga profili), plus sinjalizim i
+//   emrave të dyfishtë të lojtarëve.
 function Admin() {
   const navigate = useNavigate();
   const [checking, setChecking] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [section, setSection] = useState("overview");
+
   const [claims, setClaims] = useState([]);
-  const [loadingClaims, setLoadingClaims] = useState(true);
+  const [players, setPlayers] = useState([]);
+  const [clubs, setClubs] = useState([]);
+  const [loadingData, setLoadingData] = useState(true);
+
   const [statusFilter, setStatusFilter] = useState("pending");
   const [actioningId, setActioningId] = useState(null);
   const [actionError, setActionError] = useState("");
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchType, setSearchType] = useState("players");
+  const [togglingId, setTogglingId] = useState(null);
 
   useEffect(() => {
     const checkAdmin = async () => {
@@ -58,11 +93,15 @@ function Admin() {
   useEffect(() => {
     if (!isAdmin) return;
 
-    const loadClaims = async () => {
-      const snapshot = await get(ref(db, "clubClaims"));
+    const loadAll = async () => {
+      const [claimsSnap, playersSnap, clubsSnap] = await Promise.all([
+        get(ref(db, "clubClaims")),
+        get(ref(db, "players")),
+        get(ref(db, "clubs")),
+      ]);
 
-      if (snapshot.exists()) {
-        const data = snapshot.val();
+      if (claimsSnap.exists()) {
+        const data = claimsSnap.val();
         const list = Object.keys(data)
           .map((id) => ({ id, ...data[id] }))
           .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
@@ -70,10 +109,20 @@ function Admin() {
         setClaims(list);
       }
 
-      setLoadingClaims(false);
+      if (playersSnap.exists()) {
+        const data = playersSnap.val();
+        setPlayers(Object.keys(data).map((uid) => ({ uid, ...data[uid] })));
+      }
+
+      if (clubsSnap.exists()) {
+        const data = clubsSnap.val();
+        setClubs(Object.keys(data).map((uid) => ({ uid, ...data[uid] })));
+      }
+
+      setLoadingData(false);
     };
 
-    loadClaims();
+    loadAll();
   }, [isAdmin]);
 
   const setClaimStatus = async (claim, status) => {
@@ -139,7 +188,74 @@ function Admin() {
     }
   };
 
+  const toggleDisabled = async (kind, entity) => {
+    const path = kind === "players" ? `players/${entity.uid}` : `clubs/${entity.uid}`;
+    const nextDisabled = !entity.disabled;
+
+    setTogglingId(entity.uid);
+
+    try {
+      await update(ref(db, path), { disabled: nextDisabled });
+
+      const updater = (list) =>
+        list.map((item) => (item.uid === entity.uid ? { ...item, disabled: nextDisabled } : item));
+
+      if (kind === "players") setPlayers(updater);
+      else setClubs(updater);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Admin toggleDisabled failed:", error);
+      alert("Dështoi ndryshimi i statusit. Kontrollo nëse rregulli i Firebase është publikuar.");
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
+  // Emra lojtarësh që shfaqen më shumë se një herë — sinjalizim i shpejtë
+  // për regjistrime të dyfishta (p.sh. dikush që rregjistrohet disa herë me
+  // email të ndryshëm sepse s'i erdhi email-i i verifikimit).
+  const duplicatePlayerNames = useMemo(() => {
+    const groups = new Map();
+
+    players.forEach((player) => {
+      const fullName = `${player.profile?.name || ""} ${player.profile?.surname || ""}`.trim();
+      if (!fullName) return;
+
+      const key = normalizeName(fullName);
+      if (!groups.has(key)) groups.set(key, { label: fullName, players: [] });
+      groups.get(key).players.push(player);
+    });
+
+    return [...groups.values()].filter((group) => group.players.length > 1);
+  }, [players]);
+
   const visibleClaims = claims.filter((claim) => (claim.status || "pending") === statusFilter);
+
+  const searchResults = useMemo(() => {
+    const list = searchType === "players" ? players : clubs;
+    const query = normalizeName(searchQuery);
+
+    if (!query) return list;
+
+    return list.filter((item) => {
+      const label =
+        searchType === "players"
+          ? `${item.profile?.name || ""} ${item.profile?.surname || ""}`
+          : item.profile?.name || "";
+
+      return normalizeName(label).includes(query);
+    });
+  }, [players, clubs, searchType, searchQuery]);
+
+  const stats = useMemo(() => {
+    return {
+      totalPlayers: players.length,
+      totalClubs: clubs.length,
+      newPlayers: players.filter((p) => isWithinLastWeek(p.createdAt)).length,
+      newClubs: clubs.filter((c) => isWithinLastWeek(c.createdAt)).length,
+      pendingClaims: claims.filter((c) => (c.status || "pending") === "pending").length,
+    };
+  }, [players, clubs, claims]);
 
   if (checking) {
     return <p className="admin-loading">Duke kontrolluar qasjen...</p>;
@@ -158,79 +274,218 @@ function Admin() {
 
         <header className="admin-header">
           <p>Paneli i Administratorit</p>
-          <h1>Kërkesat për Klube</h1>
-          <span>Shqyrto kërkesat e njerëzve që duan qasje te një klub ekzistues.</span>
+          <h1>{SECTIONS.find((s) => s.key === section)?.label}</h1>
         </header>
 
-        <div className="admin-tabs">
-          {Object.keys(STATUS_LABELS).map((status) => (
+        <div className="admin-section-nav">
+          {SECTIONS.map((s) => (
             <button
-              key={status}
+              key={s.key}
               type="button"
-              className={statusFilter === status ? "admin-tab active" : "admin-tab"}
-              onClick={() => setStatusFilter(status)}
+              className={section === s.key ? "admin-section-btn active" : "admin-section-btn"}
+              onClick={() => setSection(s.key)}
             >
-              {STATUS_LABELS[status]}
-              {" "}
-              ({claims.filter((claim) => (claim.status || "pending") === status).length})
+              {s.icon} {s.label}
             </button>
           ))}
         </div>
 
-        {actionError && <p className="admin-action-error">{actionError}</p>}
-
-        {loadingClaims ? (
+        {loadingData ? (
           <p className="admin-empty">Duke ngarkuar...</p>
-        ) : visibleClaims.length === 0 ? (
-          <p className="admin-empty">Asnjë kërkesë këtu.</p>
         ) : (
-          <div className="admin-claims-list">
-            {visibleClaims.map((claim) => (
-              <div key={claim.id} className="admin-claim-card">
-                <div className="admin-claim-main">
-                  <h3>
-                    {claim.name}
-                    <span className="admin-claim-role">{claim.roleAtClub}</span>
-                  </h3>
+          <>
+            {section === "overview" && (
+              <div className="admin-stats-grid">
+                <div className="admin-stat-card">
+                  <span className="admin-stat-value">{stats.totalPlayers}</span>
+                  <span className="admin-stat-label">Lojtarë gjithsej</span>
+                </div>
+                <div className="admin-stat-card">
+                  <span className="admin-stat-value">{stats.newPlayers}</span>
+                  <span className="admin-stat-label">Lojtarë të rinj (7 ditë)</span>
+                </div>
+                <div className="admin-stat-card">
+                  <span className="admin-stat-value">{stats.totalClubs}</span>
+                  <span className="admin-stat-label">Klube gjithsej</span>
+                </div>
+                <div className="admin-stat-card">
+                  <span className="admin-stat-value">{stats.newClubs}</span>
+                  <span className="admin-stat-label">Klube të reja (7 ditë)</span>
+                </div>
+                <div className="admin-stat-card">
+                  <span className="admin-stat-value">{stats.pendingClaims}</span>
+                  <span className="admin-stat-label">Kërkesa në pritje</span>
+                </div>
+              </div>
+            )}
 
-                  <p className="admin-claim-club">
-                    Kërkon qasje te{" "}
-                    <Link to={`/clubs/${claim.clubId}`} target="_blank" rel="noopener noreferrer">
-                      {claim.clubName || claim.clubId}
-                    </Link>
-                  </p>
-
-                  <div className="admin-claim-contact">
-                    <span>{claim.email}</span>
-                    <span>{claim.phone}</span>
-                  </div>
-
-                  {claim.message && <p className="admin-claim-message">"{claim.message}"</p>}
+            {section === "claims" && (
+              <>
+                <div className="admin-tabs">
+                  {Object.keys(STATUS_LABELS).map((status) => (
+                    <button
+                      key={status}
+                      type="button"
+                      className={statusFilter === status ? "admin-tab active" : "admin-tab"}
+                      onClick={() => setStatusFilter(status)}
+                    >
+                      {STATUS_LABELS[status]}
+                      {" "}
+                      ({claims.filter((claim) => (claim.status || "pending") === status).length})
+                    </button>
+                  ))}
                 </div>
 
-                {statusFilter === "pending" && (
-                  <div className="admin-claim-actions">
-                    <button
-                      type="button"
-                      className="admin-claim-approve"
-                      disabled={actioningId === claim.id}
-                      onClick={() => setClaimStatus(claim, "approved")}
-                    >
-                      <LuCheck /> {actioningId === claim.id ? "Duke krijuar llogari..." : "Aprovo"}
-                    </button>
-                    <button
-                      type="button"
-                      className="admin-claim-reject"
-                      disabled={actioningId === claim.id}
-                      onClick={() => setClaimStatus(claim, "rejected")}
-                    >
-                      <LuX /> Refuzo
-                    </button>
+                {actionError && <p className="admin-action-error">{actionError}</p>}
+
+                {visibleClaims.length === 0 ? (
+                  <p className="admin-empty">Asnjë kërkesë këtu.</p>
+                ) : (
+                  <div className="admin-claims-list">
+                    {visibleClaims.map((claim) => (
+                      <div key={claim.id} className="admin-claim-card">
+                        <div className="admin-claim-main">
+                          <h3>
+                            {claim.name}
+                            <span className="admin-claim-role">{claim.roleAtClub}</span>
+                          </h3>
+
+                          <p className="admin-claim-club">
+                            Kërkon qasje te{" "}
+                            <Link to={`/clubs/${claim.clubId}`} target="_blank" rel="noopener noreferrer">
+                              {claim.clubName || claim.clubId}
+                            </Link>
+                          </p>
+
+                          <div className="admin-claim-contact">
+                            <span>{claim.email}</span>
+                            <span>{claim.phone}</span>
+                          </div>
+
+                          {claim.message && <p className="admin-claim-message">"{claim.message}"</p>}
+                        </div>
+
+                        {statusFilter === "pending" && (
+                          <div className="admin-claim-actions">
+                            <button
+                              type="button"
+                              className="admin-claim-approve"
+                              disabled={actioningId === claim.id}
+                              onClick={() => setClaimStatus(claim, "approved")}
+                            >
+                              <LuCheck /> {actioningId === claim.id ? "Duke krijuar llogari..." : "Aprovo"}
+                            </button>
+                            <button
+                              type="button"
+                              className="admin-claim-reject"
+                              disabled={actioningId === claim.id}
+                              onClick={() => setClaimStatus(claim, "rejected")}
+                            >
+                              <LuX /> Refuzo
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 )}
-              </div>
-            ))}
-          </div>
+              </>
+            )}
+
+            {section === "manage" && (
+              <>
+                {duplicatePlayerNames.length > 0 && (
+                  <div className="admin-duplicates-box">
+                    <p className="admin-duplicates-title">
+                      <LuTriangleAlert /> Emra të dyfishtë te lojtarët
+                    </p>
+                    <div className="admin-duplicates-list">
+                      {duplicatePlayerNames.map((group) => (
+                        <button
+                          key={group.label}
+                          type="button"
+                          className="admin-duplicate-chip"
+                          onClick={() => {
+                            setSearchType("players");
+                            setSearchQuery(group.label);
+                          }}
+                        >
+                          {group.label} ({group.players.length})
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="admin-manage-controls">
+                  <div className="admin-manage-type">
+                    <button
+                      type="button"
+                      className={searchType === "players" ? "admin-tab active" : "admin-tab"}
+                      onClick={() => setSearchType("players")}
+                    >
+                      Lojtarë
+                    </button>
+                    <button
+                      type="button"
+                      className={searchType === "clubs" ? "admin-tab active" : "admin-tab"}
+                      onClick={() => setSearchType("clubs")}
+                    >
+                      Klube
+                    </button>
+                  </div>
+
+                  <input
+                    type="text"
+                    className="admin-search-input"
+                    placeholder={searchType === "players" ? "Kërko lojtar..." : "Kërko klub..."}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+
+                {searchResults.length === 0 ? (
+                  <p className="admin-empty">Asnjë rezultat.</p>
+                ) : (
+                  <div className="admin-manage-list">
+                    {searchResults.map((item) => {
+                      const label =
+                        searchType === "players"
+                          ? `${item.profile?.name || ""} ${item.profile?.surname || ""}`.trim()
+                          : item.profile?.name || "Klub";
+
+                      return (
+                        <div key={item.uid} className="admin-manage-row">
+                          <div>
+                            <p className="admin-manage-name">
+                              {label || "(pa emër)"}
+                              {item.disabled && <span className="admin-manage-disabled-badge">Çaktivizuar</span>}
+                            </p>
+                            {searchType === "clubs" && item.profile?.league && (
+                              <p className="admin-manage-sub">{item.profile.league}</p>
+                            )}
+                          </div>
+
+                          <button
+                            type="button"
+                            className={item.disabled ? "admin-manage-enable" : "admin-manage-disable"}
+                            disabled={togglingId === item.uid}
+                            onClick={() => toggleDisabled(searchType, item)}
+                          >
+                            {togglingId === item.uid
+                              ? "..."
+                              : item.disabled
+                              ? "Aktivizo"
+                              : "Çaktivizo"}
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </>
+            )}
+          </>
         )}
       </div>
     </section>

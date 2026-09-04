@@ -15,6 +15,8 @@ import { LuArrowLeft } from "react-icons/lu";
 
 import { calculateAgeFromBirthdate, getBirthdateError, getTodayDateString } from "../../utils/age";
 
+import { normalizeName } from "../../utils/normalizeName";
+
 
 
 function Register() {
@@ -71,17 +73,10 @@ function Register() {
     loadClubs();
   }, [role]);
 
-  const normalizeClubName = (value) =>
-    value
-      .trim()
-      .toLowerCase()
-      .replace(/ë/g, "e")
-      .replace(/ç/g, "c");
-
   const matchingClubs =
     role === "club" && clubSelection === "new" && name.trim()
       ? existingClubs.filter(
-          (club) => normalizeClubName(club.profile?.name || "") === normalizeClubName(name)
+          (club) => normalizeName(club.profile?.name || "") === normalizeName(name)
         )
       : [];
 
@@ -195,6 +190,12 @@ function Register() {
 
       if (role === "player") {
         await set(ref(db, "players/" + user.uid), {
+          // false deri sa të verifikojë email-in dhe të futet një herë (shih
+          // Login.jsx) — Players.jsx (kërkimi publik) e fsheh profilin deri
+          // atëherë, që të mos mbushet direktoria me llogari të pa-vërtetuara
+          // (dikush që s'e merr dot email-in dhe rregjistrohet disa herë me
+          // email të ndryshëm, p.sh.).
+          emailVerified: false,
           profile: {
             name,
             surname,

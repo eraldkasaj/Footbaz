@@ -59,7 +59,7 @@ function League_Clubs() {
 
         const clubsArray = Object.keys(data)
           .map((uid) => ({ uid, ...data[uid] }))
-          .filter((club) => club.profile?.league === league)
+          .filter((club) => club.profile?.league === league && !club.disabled)
           .map((club) => {
             const squadPlayers = getSquadPlayers(club, playersById);
             const { squadSize, avgAge, foreigners } = computeSquadStats(squadPlayers);
