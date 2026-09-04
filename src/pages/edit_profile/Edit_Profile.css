@@ -136,6 +136,25 @@ border-color:var(--brand-green);
 
 }
 
+.form-group input:disabled,
+.form-group select:disabled{
+
+opacity:0.6;
+
+cursor:not-allowed;
+
+}
+
+.form-hint{
+
+color:var(--text-secondary);
+
+font-size:0.82rem;
+
+margin-top:-6px;
+
+}
+
 
 
 

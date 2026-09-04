@@ -1,0 +1,44 @@
+name: Sinkronizo Ndeshjet nga FSHF
+
+# Xhirohet vetë 1 herë në ditë (06:00 UTC ~ 07:00/08:00 orë Shqipërie, varet
+# nga ora verore/dimërore) dhe merr rezultatet/ndeshjet zyrtare nga fshf.org
+# për klubet tona të regjistruara — shih scripts/fshf-sync.cjs për detajet.
+#
+# Për ta ndryshuar orarin: mjafton të ndryshohet vlera "cron" më poshtë
+# (format: minutë orë ditëMuaji muaj ditëJave, gjithmonë në UTC).
+#
+# Mund të xhirohet edhe manualisht: te GitHub, tab-i "Actions" → "Sinkronizo
+# Ndeshjet nga FSHF" → "Run workflow".
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Merr kodin
+        uses: actions/checkout@v4
+
+      - name: Instalo Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Instalo varësitë
+        run: npm ci
+
+      - name: Shkruaj çelësin e Firebase (përkohësisht, vetëm për këtë xhirim)
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: echo "$FIREBASE_SERVICE_ACCOUNT" > serviceAccountKey.json
+
+      - name: Sinkronizo nga FSHF
+        run: node scripts/fshf-sync.cjs
+
+      - name: Fshi çelësin
+        if: always()
+        run: rm -f serviceAccountKey.json

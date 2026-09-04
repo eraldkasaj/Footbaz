@@ -1100,11 +1100,6 @@
   font-size:12px;
 }
 
-.club-match-actions{
-  display:flex;
-  gap:8px;
-}
-
 /* ---------------- Statistics ---------------- */
 
 .club-record-grid{
@@ -1233,6 +1228,8 @@
 
 .club-staff-card h4{ margin:0 0 4px; font-size:15px; }
 .club-staff-card p{ margin:0; color:var(--text-secondary); font-size:12px; }
+
+.club-staff-meta{ margin-top:4px !important; color:var(--cd-text-dimmer); font-size:11px !important; }
 
 .club-staff-remove{
   position:absolute;

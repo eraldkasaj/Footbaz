@@ -318,11 +318,13 @@ type="text"
 
 value={name}
 
-onChange={(e)=>setName(e.target.value)}
+disabled
 
 placeholder="p.sh. FK Partizani"
 
 />
+
+<small className="form-hint">Për të ndryshuar emrin, kontakto footbazinfo@gmail.com.</small>
 
 </div>
 
@@ -338,7 +340,7 @@ placeholder="p.sh. FK Partizani"
 
 value={league}
 
-onChange={(e)=>setLeague(e.target.value)}
+disabled
 
 >
 
@@ -351,6 +353,8 @@ onChange={(e)=>setLeague(e.target.value)}
 ))}
 
 </select>
+
+<small className="form-hint">Për të ndryshuar kampionatin, kontakto footbazinfo@gmail.com.</small>
 
 </div>
 

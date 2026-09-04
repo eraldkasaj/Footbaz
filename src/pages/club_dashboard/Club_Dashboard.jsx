@@ -21,6 +21,7 @@ import {
   LuMessageSquare,
   LuUserCog,
   LuSettings,
+  LuKeyRound,
   LuLogOut,
 } from "react-icons/lu";
 
@@ -209,6 +210,13 @@ function Club_Dashboard() {
                 </span>{" "}
                 Profili im
               </li>
+
+              <li onClick={() => navigate("/settings")}>
+                <span className="club-nav-icon">
+                  <LuKeyRound />
+                </span>{" "}
+                Cilësimet
+              </li>
             </ul>
           </nav>
         </div>
@@ -266,13 +274,7 @@ function Club_Dashboard() {
         )}
 
         {activeView === "matches" && (
-          <Matches
-            clubUid={clubUid}
-            matches={matches}
-            setMatches={setMatches}
-            clubName={clubName}
-            clubPhotoURL={club?.photoURL}
-          />
+          <Matches matches={matches} clubName={clubName} clubPhotoURL={club?.photoURL} />
         )}
 
         {activeView === "statistics" && (

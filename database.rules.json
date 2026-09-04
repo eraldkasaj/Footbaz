@@ -19,7 +19,7 @@
       ".read": true,
       ".indexOn": ["ownerUid"],
       "$clubId": {
-        ".write": "auth != null && (auth.uid === $clubId || root.child('clubs').child($clubId).child('ownerUid').val() === auth.uid)",
+        ".write": "auth != null && (auth.uid === $clubId || root.child('clubs').child($clubId).child('ownerUid').val() === auth.uid) && (!data.exists() || (newData.child('profile').child('name').val() === data.child('profile').child('name').val() && newData.child('profile').child('league').val() === data.child('profile').child('league').val() && newData.child('matches').val() === data.child('matches').val()))",
         "disabled": {
           ".write": "auth != null && (auth.uid === $clubId || root.child('users').child(auth.uid).child('role').val() === 'admin')"
         },
